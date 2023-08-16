@@ -1,5 +1,28 @@
 # distributed-ml-system
 
+## Setup
+
+[1] TensorFlow
+- `pip install tensorflow`
+
+[2] docker
+
+[3] kubectl
+- `brew install kubectl`
+
+[4] k3d.io
+- `wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash`
+- `k3d cluster create mycluster`
+- `kubectl get nodes`
+
+[5] kubectx and kubens
+- `brew install kubectx`
+
+For example if you want to create a kubernetes pod, then create a hello-world.yaml and then do `kubectl create -f hello-world.yaml` 
+
+then `kubectl get pods`
+
+
 ## Introduction
 
 We are building an image classification end-to-end machine learning system.
