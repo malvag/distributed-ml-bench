@@ -1,22 +1,26 @@
-# distributed-ml-system
+# Distributed ML Systems
 
 ## Setup
 
-[1] TensorFlow
+[1] We will be using [TensorFlow](https://www.tensorflow.org) for data processing, model building and evaluation
 - `pip install tensorflow`
 
-[2] docker
+[2] [Docker](https://docker-curriculum.com/#setting-up-your-computer)
 
 [3] kubectl
 - `brew install kubectl`
 
-[4] k3d.io
+[4] We will use kubernetes as our core distributed infrastructure. We will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker
 - `wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash`
 - `k3d cluster create mycluster`
 - `kubectl get nodes`
 
-[5] kubectx and kubens
+[5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens
 - `brew install kubectx`
+
+[6] We will use [Kubeflow](https://www.kubeflow.org) to submit jobs to the kubernetes cluster
+
+[7] We wil also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end to end machine learning workflows
 
 For example if you want to create a kubernetes pod, then create a hello-world.yaml and then do `kubectl create -f hello-world.yaml` 
 
