@@ -20,7 +20,25 @@
 
 For example if you want to create a kubernetes pod, then create a hello-world.yaml and then do `kubectl create -f hello-world.yaml` 
 
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: whalesay
+spec:
+  containers:
+  - name: whalesay
+    image: docker/whalesay:latest
+    command: [cowsay]
+    args: ["hello world"]
+```
+
 then `kubectl get pods`
+
+to see what is being printed out in the contianer, you can do  `kubectl logs whalesay`
+
+If you want to get the details of a single pod with the raw yaml, then do `kubectl get pod whalesay -o yaml`
+You can get the JSON or any other format as well
 
 
 ## Introduction
