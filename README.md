@@ -1,24 +1,34 @@
 # Distributed ML Systems
 
+Distributing machine learning systems allow developers to handle extremely large datasets across multiple clusters, take advantage of automation tools, and benefit from hardware accelerations. This repo includes code and references to implement scalable and reliable machine learning system.
+
+We are going to automate machine learning tasks with Kubernetes, Argo Workflows, Kubeflow and TensorFlow.
+
+Our goal is to construct machine learning pipelines with data ingestion, distibuted training, model serving, managing and monitoring these workloads.
+ 
 ## Setup
+
+I'm using a mac and brew to install the tools
 
 [1] We will be using [TensorFlow](https://www.tensorflow.org) for data processing, model building and evaluation
 - `pip install tensorflow`
 
-[2] [Docker](https://docker-curriculum.com/#setting-up-your-computer)
+[2] [Docker](https://docker-curriculum.com/#setting-up-your-computer) to create single- or multi-node [k3s](https://k3s.io) clusters
 
-[3] kubectl
+[3] kubectl is a CLI for Kubernetes
 - `brew install kubectl`
 
-[4] We will use kubernetes as our core distributed infrastructure. We will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker
+[4] We will use Kubernetes as our core distributed infrastructure. Infact we will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker
+
+To install k3d:
 - `wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash`
-- `k3d cluster create mycluster`
+- `k3d cluster create dist-ml`
 - `kubectl get nodes`
 
-[5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens
+[5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
 - `brew install kubectx`
 
-[6] We will use [Kubeflow](https://www.kubeflow.org) to submit jobs to the kubernetes cluster
+[6] We will use [Kubeflow](https://www.kubeflow.org) to submit jobs to the Kubernetes cluster
 
 [7] We wil also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end to end machine learning workflows
 
@@ -39,7 +49,7 @@ spec:
 
 then `kubectl get pods`
 
-to see what is being printed out in the contianer, you can do  `kubectl logs whalesay`
+to see what is being printed out in the container, you can do  `kubectl logs whalesay`
 
 If you want to get the details of a single pod with the raw yaml, then do `kubectl get pod whalesay -o yaml`
 You can get the JSON or any other format as well
@@ -47,7 +57,7 @@ You can get the JSON or any other format as well
 
 ## Introduction
 
-We are building an image classification end-to-end machine learning system.
+We are building an image classification end-to-end machine learning system. 
 
 ### System Architecture
 
