@@ -8,7 +8,7 @@ Our goal is to construct machine learning pipelines with data ingestion, distibu
  
 ## Setup
 
-I'm using a mac and brew to install the tools
+I'm using a mac and brew to install the tools. We are going to install Tensorflow, Docker, kubectl, k3d which is a lightweight wrapper for k3s which is lightweight kubernetes.
 
 [1] We will be using [TensorFlow](https://www.tensorflow.org) for data processing, model building and evaluation
 - `pip install tensorflow`
