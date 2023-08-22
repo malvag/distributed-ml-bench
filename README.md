@@ -30,6 +30,8 @@ To install k3d:
 
 [6] We will use [Kubeflow](https://www.kubeflow.org) to submit jobs to the Kubernetes cluster
 
+![Kubeflow UI](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/aa731d8d-93cf-4089-a7a4-4a9b0f47e4eb "https://www.kubeflow.org/docs/started/architecture/")
+
 [7] We wil also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end to end machine learning workflows
 
 For example if you want to create a kubernetes pod, then create a hello-world.yaml and then do `kubectl create -f hello-world.yaml` 
