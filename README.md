@@ -1,14 +1,14 @@
 # Distributed ML Systems
 
-Distributing machine learning systems allow developers to handle extremely large datasets across multiple clusters, take advantage of automation tools, and benefit from hardware accelerations. This repo includes code and references to implement scalable and reliable machine learning system.
+Distributing machine learning systems allows developers to handle extremely large datasets across multiple clusters, take advantage of automation tools, and benefit from hardware accelerations. This repo includes code and references to implement a scalable and reliable machine learning system.
 
-We are going to automate machine learning tasks with Kubernetes, Argo Workflows, Kubeflow and TensorFlow.
+We will automate machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow.
 
-Our goal is to construct machine learning pipelines with data ingestion, distibuted training, model serving, managing and monitoring these workloads.
+Our goal is to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads.
  
 ## Setup
 
-I'm using a mac and brew to install the tools. We are going to install Tensorflow, Docker, kubectl, k3d which is a lightweight wrapper for k3s which is lightweight kubernetes.
+I'm using a mac and brew to install the tools. We are going to install Tensorflow, Docker, kubectl, and k3d which is a lightweight wrapper for k3s which is lightweight Kubernetes.
 
 [1] We will be using [TensorFlow](https://www.tensorflow.org) for data processing, model building and evaluation
 - `pip install tensorflow`
@@ -18,7 +18,7 @@ I'm using a mac and brew to install the tools. We are going to install Tensorflo
 [3] kubectl is a CLI for Kubernetes
 - `brew install kubectl`
 
-[4] We will use Kubernetes as our core distributed infrastructure. Infact we will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker
+[4] We will use Kubernetes as our core distributed infrastructure. In fact we will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker
 
 To install k3d:
 - `wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash`
@@ -54,7 +54,7 @@ then `kubectl get pods`
 to see what is being printed out in the container, you can do  `kubectl logs whalesay`
 
 If you want to get the details of a single pod with the raw yaml, then do `kubectl get pod whalesay -o yaml`
-You can get the JSON or any other format as well
+You can get the JSON or any other format as well.
 
 
 ## Introduction
@@ -71,7 +71,7 @@ We will use the Fashion MNIST dataset which contains 70,000 grayscale images in 
 
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/9356978d-f3ab-4404-b35b-d5e50b3c82cb)
 
-Here, 60,000 images are used to train the network and 10,000 images to evaluate how accurately the network learned to classify images.
+Here, 60,000 images are used to train the network and 10,000 images are used to evaluate how accurately the network learned to classify images.
 
 
 ## Model Training
