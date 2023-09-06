@@ -83,22 +83,43 @@ Load the fashion-mnist dataset into a `tf.data.Dataset` object and do some prepr
 import tensorflow_datasets as tfds
 import tensorflow as tf
 
-def make_datasets():
- BUFFER_SIZE=10000
- def scale(image, label):
-  image = tf.cast(image, tf.float32)
-  image /= 255
-  return image, label
- datasets, info = tfds.load(name='mnist, with_info=True, as_supervised=True)
- mnist_train = datasets['train']
- return mnist_train.map(scale).cache().shuffle(BUFFER_SIZE)
+def mnist_dataset():
+    BUFFER_SIZE = 10000
+    def scale(image, label):
+        image = tf.cast(image, tf.float32)
+        image /= 255
+        return image, label
+    datasets, info = tfds.load(name='mnist, with_info=True, as_supervised=True)
+    mnist_train = datasets['train']
+    return mnist_train.map(scale).cache().shuffle(BUFFER_SIZE)
 ```
 
 We have used the tensorflow_datasets module which contains a collection of datasets ready to use. This gives us a shuffled dataset where each element consists of images and labels.
 
 #### Distributed Data Pipeline
 
-We can consume our dataset in a distributed fashion as well and to do that we can use the same function we created before.
+We can consume our dataset in a distributed fashion as well and to do that we can use the same function we created before with some tweaks. When training a model with multiple GPUs, you can use the extra computing power effectively by increasing the batch size. In general, use the largest batch size that fits the GPU memory.
+
+```
+strategy = tf.distribute.MultiWorkerMirroredStrategy()
+BATCH_SIZE_PER_REPLICA = 64
+BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
+```
+
+The `num_replicas_in_sync` equals the number of devices that are used in the [all-reduce]() operation. We have used the `tf.distribute.MultiWorkerMirroredStrategy` API and with the help of this strategy, a Keras model that was designed to run on a single worker can seamlessly work on multiple workers with minimal code changes.
+
+We have also enabled automatic data sharding by setting `tf.data.experimental.AutoShardPolicy` to `AutoShardPolicy.DATA`. You can read about it [here](https://www.tensorflow.org/api_docs/python/tf/data/experimental/DistributeOptions).
+
+```
+with strategy.scope():
+    dataset = mnist_dataset().batch(BATCH_SIZE).repeat()
+    options = tf.data.Options()
+    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+    dataset = dataset.with_options(options)
+    model = build_and_compile_cnn_model()
+
+model.fit(dataset, epochs=3, steps_per_epoch=70)
+```
 
 ## Model Training
 
