@@ -73,6 +73,32 @@ We will use the Fashion MNIST dataset which contains 70,000 grayscale images in 
 
 Here, 60,000 images are used to train the network and 10,000 images are used to evaluate how accurately the network learned to classify images.
 
+#### Single-node Data Pipeline
+
+The `tf.data` API enables you to build complex input pipelines from simple, reusable pieces. It's very efficient. It makes it possible to handle large amounts of data, read from different data formats, and perform complex transformations.
+
+Load the fashion-mnist dataset into a `tf.data.Dataset` object and do some preprocessing. We normalize the image pixel values from the [0, 255] range to the [0, 1] range. We are keeping an in-memory cache to improve performance. We also shuffle the training data.
+
+```
+import tensorflow_datasets as tfds
+import tensorflow as tf
+
+def make_datasets():
+ BUFFER_SIZE=10000
+ def scale(image, label):
+  image = tf.cast(image, tf.float32)
+  image /= 255
+  return image, label
+ datasets, info = tfds.load(name='mnist, with_info=True, as_supervised=True)
+ mnist_train = datasets['train']
+ return mnist_train.map(scale).cache().shuffle(BUFFER_SIZE)
+```
+
+We have used the tensorflow_datasets module which contains a collection of datasets ready to use. This gives us a shuffled dataset where each element consists of images and labels.
+
+#### Distributed Data Pipeline
+
+We can consume our dataset in a distributed fashion as well and to do that we can use the same function we created before.
 
 ## Model Training
 
