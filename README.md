@@ -114,7 +114,7 @@ BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
 
 The `num_replicas_in_sync` equals the number of devices that are used in the [all-reduce]() operation. We have used the `tf.distribute.MultiWorkerMirroredStrategy` API and with the help of this strategy, a Keras model that was designed to run on a single worker can seamlessly work on multiple workers with minimal code changes.
 
-We have also enabled automatic data sharding by setting `tf.data.experimental.AutoShardPolicy` to `AutoShardPolicy.DATA`. You can read about it [here](https://www.tensorflow.org/api_docs/python/tf/data/experimental/DistributeOptions).
+We have also enabled automatic data sharding by setting `tf.data.experimental.AutoShardPolicy` to `AutoShardPolicy.DATA`. This setting does shards by elements produced by the dataset. Each worker will process the whole dataset and discard the portion that is not for itself. You can read more about it [here](https://www.tensorflow.org/api_docs/python/tf/data/experimental/DistributeOptions).
 
 ```python
 with strategy.scope():
@@ -128,6 +128,67 @@ model.fit(dataset, epochs=3, steps_per_epoch=70)
 ```
 
 ## Model Training
+
+Now we have created a data ingestion component for distributed ingestion and have enabled the sharding as well.
+
+```python
+model = tf.keras.Sequential([
+    tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(28, 28, 1)),
+    tf.keras.layers.MaxPooling2D(),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(10)
+  ])
+
+model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+              metrics=['accuracy'])
+```
+
+Next, we created a model and instantiated the optimizer. We are using accuracy to evaluate the model and sparse categorical cross entropy as the loss function.
+
+Now we can train the model. We are also defining callbacks that will be executed during model training.
+
+1. `tf.keras.callbacks.ModelCheckpoint` saves the model at a certain frequency, such as after every epoch
+
+```python
+checkpoint_dir = './training_checkpoints'
+checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
+```
+Here we are defining the checkpoint directory to store the checkpoints and  the name of the checkpoint files.
+
+2. `tf.keras.callbacks.TensorBoard` writes a log for TensorBoard, which allows you to visualize the graphs
+3. `tf.keras.callbacks.LearningRateScheduler` schedules the learning rate to change after, for example, every epoch/batch
+
+```python
+def decay(epoch):
+  if epoch < 3:
+    return 1e-3
+  elif epoch >= 3 and epoch < 7:
+    return 1e-4
+  else:
+    return 1e-5
+```
+
+4. PrintLR prints the learning rate at the end of each epoch
+
+```python
+class PrintLR(tf.keras.callbacks.Callback):
+  def on_epoch_end(self, epoch, logs=None):
+    print('\nLearning rate for epoch {} is {}'.format(        epoch + 1, model.optimizer.lr.numpy()))
+```
+
+We put together all the callbacks.
+
+```python
+callbacks = [
+    tf.keras.callbacks.TensorBoard(log_dir='./logs'),
+    tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_prefix,
+                                       save_weights_only=True),
+    tf.keras.callbacks.LearningRateScheduler(decay),
+    PrintLR()
+]
+```
 
 ## Model Serving
 
