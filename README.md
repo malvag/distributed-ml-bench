@@ -11,19 +11,25 @@ Our goal is to construct machine learning pipelines with data ingestion, distrib
 I'm using a mac and brew to install the tools. We are going to install Tensorflow, Docker, kubectl, and k3d which is a lightweight wrapper for k3s which is lightweight Kubernetes.
 
 [1] We will be using [TensorFlow](https://www.tensorflow.org) for data processing, model building and evaluation
-- `pip install tensorflow`
+```bash
+pip install tensorflow
+```
 
 [2] [Docker](https://docker-curriculum.com/#setting-up-your-computer) to create single- or multi-node [k3s](https://k3s.io) clusters
 
 [3] kubectl is a CLI for Kubernetes
-- `brew install kubectl`
+```bash
+brew install kubectl
+```
 
 [4] We will use Kubernetes as our core distributed infrastructure. In fact we will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker
 
 To install k3d:
-- `wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash`
-- `k3d cluster create dist-ml`
-- `kubectl get nodes`
+```bash
+wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash
+k3d cluster create dist-ml
+kubectl get nodes
+```
 
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
 - `brew install kubectx`
@@ -36,7 +42,7 @@ To install k3d:
 
 For example if you want to create a kubernetes pod, then create a hello-world.yaml and then do `kubectl create -f hello-world.yaml` 
 
-```
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -79,7 +85,7 @@ The `tf.data` API enables you to build complex input pipelines from simple, reus
 
 Load the fashion-mnist dataset into a `tf.data.Dataset` object and do some preprocessing. We normalize the image pixel values from the [0, 255] range to the [0, 1] range. We are keeping an in-memory cache to improve performance. We also shuffle the training data.
 
-```
+```python
 import tensorflow_datasets as tfds
 import tensorflow as tf
 
@@ -100,7 +106,7 @@ We have used the tensorflow_datasets module which contains a collection of datas
 
 We can consume our dataset in a distributed fashion as well and to do that we can use the same function we created before with some tweaks. When training a model with multiple GPUs, you can use the extra computing power effectively by increasing the batch size. In general, use the largest batch size that fits the GPU memory.
 
-```
+```python
 strategy = tf.distribute.MultiWorkerMirroredStrategy()
 BATCH_SIZE_PER_REPLICA = 64
 BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
@@ -110,7 +116,7 @@ The `num_replicas_in_sync` equals the number of devices that are used in the [al
 
 We have also enabled automatic data sharding by setting `tf.data.experimental.AutoShardPolicy` to `AutoShardPolicy.DATA`. You can read about it [here](https://www.tensorflow.org/api_docs/python/tf/data/experimental/DistributeOptions).
 
-```
+```python
 with strategy.scope():
     dataset = mnist_dataset().batch(BATCH_SIZE).repeat()
     options = tf.data.Options()
