@@ -67,7 +67,7 @@ You can get the JSON or any other format as well.
 
 We are building an image classification end-to-end machine learning system. 
 
-### System Architecture
+## System Architecture
 
 <img width="1143" alt="Screenshot 2023-06-30 at 12 50 13 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/18bb1322-1970-4ef4-a3a6-f7d345623ee0">
 
@@ -79,7 +79,7 @@ We will use the Fashion MNIST dataset which contains 70,000 grayscale images in 
 
 Here, 60,000 images are used to train the network and 10,000 images are used to evaluate how accurately the network learned to classify images.
 
-#### Single-node Data Pipeline
+### Single-node Data Pipeline
 
 The `tf.data` API enables you to build complex input pipelines from simple, reusable pieces. It's very efficient. It makes it possible to handle large amounts of data, read from different data formats, and perform complex transformations.
 
@@ -102,7 +102,7 @@ def mnist_dataset():
 
 We have used the tensorflow_datasets module which contains a collection of datasets ready to use. This gives us a shuffled dataset where each element consists of images and labels.
 
-#### Distributed Data Pipeline
+### Distributed Data Pipeline
 
 We can consume our dataset in a distributed fashion as well and to do that we can use the same function we created before with some tweaks. When training a model with multiple GPUs, you can use the extra computing power effectively by increasing the batch size. In general, use the largest batch size that fits the GPU memory.
 
@@ -114,7 +114,7 @@ BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
 
 The `num_replicas_in_sync` equals the number of devices that are used in the [all-reduce]() operation. We have used the `tf.distribute.MultiWorkerMirroredStrategy` API and with the help of this strategy, a Keras model that was designed to run on a single worker can seamlessly work on multiple workers with minimal code changes.
 
-We have also enabled automatic data sharding across workers by setting `tf.data.experimental.AutoShardPolicy` to `AutoShardPolicy.DATA`. This setting is needed to ensure convergence and reproducibility. Sharding means handing each worker a subset of the entire dataset. You can read more about it [here](https://www.tensorflow.org/api_docs/python/tf/data/experimental/DistributeOptions).
+We have also enabled automatic data sharding across workers by setting `tf.data.experimental.AutoShardPolicy` to `AutoShardPolicy.DATA`. This setting is needed to ensure convergence and performance. Sharding means handing each worker a subset of the entire dataset. You can read more about it [here](https://www.tensorflow.org/api_docs/python/tf/data/experimental/DistributeOptions).
 
 ```python
 with strategy.scope():
@@ -201,7 +201,7 @@ single_worker_model.fit(dataset, epochs=3, steps_per_epoch=70, callbacks=callbac
 
 After training, we get an accuracy of 94% on the training data.
 
-#### Distributed Model Training
+### Distributed Model Training
 
 Next, we can insert the distributed training logic so that we can train the model on multiple workers. We are using the MultiWorkerMirroredStrategy with Keras.
 
@@ -212,6 +212,21 @@ In general, there are two common ways to do [distributed training with data para
 We are using the MultiWorkerMirroredStrategy which implements synchronous distributed training across multiple workers, each with potentially multiple GPUs. It replicates all variables and computations to each local device and uses distributed collective implementation (e.g. all-reduce) so that multiple workers can work together.
 
 Once we define our distributed training strategy, we initiate our distributed input data pipeline and the model inside the strategy scope.
+
+### Model saving and loading
+
+To save the model using `model.save`, the saving destinations need to be different for each worker.
+
+- For non-chief workers, save the model to a temporary directory
+- For the chief, save the model to the provided directory
+The temporary directories of the workers need to be unique to prevent errors. The model saved in all the directories is identical, and only the model saved by the chief should be referenced for restoring or serving.
+
+We will not save the model to temporary directories as it will waste our computing resources and memory. We will determine which worker is the chief and save its model only.
+
+```python
+def _is_chief():
+  return task_id == 0
+```
 
 ## Model Serving
 
