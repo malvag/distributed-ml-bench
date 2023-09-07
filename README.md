@@ -62,6 +62,7 @@ to see what is being printed out in the container, you can do  `kubectl logs wha
 If you want to get the details of a single pod with the raw yaml, then do `kubectl get pod whalesay -o yaml`
 You can get the JSON or any other format as well.
 
+Create a namespace using `kubectl create namespace kubeflow`
 
 ## Introduction
 
@@ -222,10 +223,48 @@ To save the model using `model.save`, the saving destinations need to be differe
 The temporary directories of the workers need to be unique to prevent errors. The model saved in all the directories is identical, and only the model saved by the chief should be referenced for restoring or serving.
 
 We will not save the model to temporary directories as it will waste our computing resources and memory. We will determine which worker is the chief and save its model only.
+We can determine if the worker is the chief or not using the environment variable `TF_CONFIG`. Here's an example configuration:
+
+```python
+tf_config = {
+    'cluster': {
+        'worker': ['localhost:12345', 'localhost:23456']
+    },
+    'task': {'type': 'worker', 'index': 0}
+}
+```
+The `_is_chief` is a utility function that inspects the cluster spec and current task type and returns True if the worker is the chief and False otherwise.
 
 ```python
 def _is_chief():
-  return task_id == 0
+  return TASK_INDEX == 0
+
+tf_config = json.loads(os.environ.get('TF_CONFIG') or '{}')
+TASK_INDEX = tf_config['task']['index']
+
+if _is_chief():
+    model_path = args.saved_model_dir
+else:
+    model_path = args.saved_model_dir + '/worker_tmp_' + str(TASK_INDEX)
+
+multi_worker_model.save(model_path)
+```
+
+### Containerization
+
+We put everything we wrote till now into a Python script called `multi-worker-distributed-training.py`. Now we can dockerize it to train the model in the Kubernetes cluster.
+
+```dockerfile
+FROM python:3.9
+RUN pip install tensorflow==2.12.0 tensorflow_datasets==4.9.2
+COPY multi-worker-distributed-training.py /
+```
+
+We then build the image from the dockerfile and import it to the k3d cluster as it does not have access to the image registry.
+
+```bash
+docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .
+k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml
 ```
 
 ## Model Serving
