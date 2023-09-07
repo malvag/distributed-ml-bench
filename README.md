@@ -114,7 +114,7 @@ BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
 
 The `num_replicas_in_sync` equals the number of devices that are used in the [all-reduce]() operation. We have used the `tf.distribute.MultiWorkerMirroredStrategy` API and with the help of this strategy, a Keras model that was designed to run on a single worker can seamlessly work on multiple workers with minimal code changes.
 
-We have also enabled automatic data sharding by setting `tf.data.experimental.AutoShardPolicy` to `AutoShardPolicy.DATA`. This setting does shards by elements produced by the dataset. Each worker will process the whole dataset and discard the portion that is not for itself. You can read more about it [here](https://www.tensorflow.org/api_docs/python/tf/data/experimental/DistributeOptions).
+We have also enabled automatic data sharding across workers by setting `tf.data.experimental.AutoShardPolicy` to `AutoShardPolicy.DATA`. This setting is needed to ensure convergence and reproducibility. Sharding means handing each worker a subset of the entire dataset. You can read more about it [here](https://www.tensorflow.org/api_docs/python/tf/data/experimental/DistributeOptions).
 
 ```python
 with strategy.scope():
@@ -132,17 +132,19 @@ model.fit(dataset, epochs=3, steps_per_epoch=70)
 Now we have created a data ingestion component for distributed ingestion and have enabled the sharding as well.
 
 ```python
-model = tf.keras.Sequential([
-    tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(28, 28, 1)),
-    tf.keras.layers.MaxPooling2D(),
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(10)
-  ])
-
-model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-              metrics=['accuracy'])
+def build_and_compile_cnn_model():
+  model = tf.keras.Sequential([
+      tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(28, 28, 1)),
+      tf.keras.layers.MaxPooling2D(),
+      tf.keras.layers.Flatten(),
+      tf.keras.layers.Dense(64, activation='relu'),
+      tf.keras.layers.Dense(10)
+    ])
+  
+  model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+                metrics=['accuracy'])
+  return model
 ```
 
 Next, we created a model and instantiated the optimizer. We are using accuracy to evaluate the model and sparse categorical cross entropy as the loss function.
@@ -189,6 +191,27 @@ callbacks = [
     PrintLR()
 ]
 ```
+
+Next, we can train the model
+
+```python
+single_worker_model = build_and_compile_cnn_model()
+single_worker_model.fit(dataset, epochs=3, steps_per_epoch=70, callbacks=callbacks)
+```
+
+After training, we get an accuracy of 94% on the training data.
+
+#### Distributed Model Training
+
+Next, we can insert the distributed training logic so that we can train the model on multiple workers. We are using the MultiWorkerMirroredStrategy with Keras.
+
+In general, there are two common ways to do [distributed training with data parallelism](https://www.tensorflow.org/tutorials/distribute/multi_worker_with_keras):
+1. Synchronous training, where the steps of training are synced across the workers and replicas. Here, all workers train over different slices of input data in sync, and aggregating gradients at each step.
+2. Asynchronous training, where the training steps are not strictly synced. Here, all workers are independently training over the input data and updating variables asynchronously. For instance, [parameter server training](https://www.tensorflow.org/tutorials/distribute/parameter_server_training).
+
+We are using the MultiWorkerMirroredStrategy which implements synchronous distributed training across multiple workers, each with potentially multiple GPUs. It replicates all variables and computations to each local device and uses distributed collective implementation (e.g. all-reduce) so that multiple workers can work together.
+
+Once we define our distributed training strategy, we initiate our distributed input data pipeline and the model inside the strategy scope.
 
 ## Model Serving
 
