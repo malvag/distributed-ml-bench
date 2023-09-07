@@ -96,7 +96,7 @@ def mnist_dataset():
         image = tf.cast(image, tf.float32)
         image /= 255
         return image, label
-    datasets, info = tfds.load(name='mnist, with_info=True, as_supervised=True)
+    datasets, info = tfds.load(name='mnist', with_info=True, as_supervised=True)
     mnist_train = datasets['train']
     return mnist_train.map(scale).cache().shuffle(BUFFER_SIZE)
 ```
