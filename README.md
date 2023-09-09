@@ -1,6 +1,6 @@
 # Distributed ML Systems
 
-Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. So here I will be building a scalable ML app with fashion-mnist. Let's get into it.
+Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. So I wanted to build it again on a smaller scale.
 
 Why distributed systems? Distributing machine learning systems allows developers to handle extremely large datasets across multiple clusters, take advantage of automation tools, and benefit from hardware accelerations. This repo includes code and references to implement a scalable and reliable machine learning system.
 
