@@ -338,6 +338,10 @@ Next, We can submit this TFJob to our cluster and start our distributed model tr
 kubectl create -f multi-worker-tfjob.yaml
 ```
 
+Let's start the pods and train our distributed model.
+
+
+
 ## Model Serving
 
 ## End-to-end Workflow
