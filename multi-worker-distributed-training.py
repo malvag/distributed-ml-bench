@@ -14,12 +14,13 @@ def mnist_dataset():
         image = tf.cast(image, tf.float32)
         image /= 255
         return image, label
-    
+
     # Use Fashion-MNIST: https://www.tensorflow.org/datasets/catalog/fashion_mnist
-    datasets, info = tfds.load(name='fashion_mnist', with_info=True, as_supervised=True)
-    mnist_train = datasets['train']
+    datasets, info = tfds.load(name="fashion_mnist", with_info=True, as_supervised=True)
+    mnist_train = datasets["train"]
 
     return mnist_train.map(scale).cache().shuffle(BUFFER_SIZE)
+
 
 # Learning rate decay
 def decay(epoch):
@@ -33,20 +34,24 @@ def decay(epoch):
 
 # Functional API
 def build_and_compile_cnn_model():
-    print("Training CNN model")  
-    model = tf.keras.Sequential([
-      tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(28, 28, 1)),
-      tf.keras.layers.MaxPooling2D(),
-      tf.keras.layers.Flatten(),
-      tf.keras.layers.Dense(64, activation='relu'),
-      tf.keras.layers.Dense(10)
-    ])
+    print("Training CNN model")
+    model = tf.keras.Sequential(
+        [
+            tf.keras.layers.Conv2D(32, 3, activation="relu", input_shape=(28, 28, 1)),
+            tf.keras.layers.MaxPooling2D(),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(64, activation="relu"),
+            tf.keras.layers.Dense(10),
+        ]
+    )
 
     model.summary()
-  
-    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-                metrics=['accuracy'])
+
+    model.compile(
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        metrics=["accuracy"],
+    )
     return model
 
 
@@ -54,54 +59,54 @@ def build_and_compile_cnn_model():
 def build_and_compile_cnn_model_with_batch_norm():
     print("Training CNN model with batch normalization")
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Input(shape=(28, 28, 1), name='image_bytes'))
-    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Input(shape=(28, 28, 1), name="image_bytes"))
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation="relu"))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Activation('sigmoid'))
+    model.add(tf.keras.layers.Activation("sigmoid"))
     model.add(tf.keras.layers.MaxPooling2D((2, 2)))
-    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation="relu"))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Activation('sigmoid'))
+    model.add(tf.keras.layers.Activation("sigmoid"))
     model.add(tf.keras.layers.MaxPooling2D((2, 2)))
-    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation="relu"))
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(64, activation='relu'))
-    model.add(tf.keras.layers.Dense(10, activation='softmax'))
-    
+    model.add(tf.keras.layers.Dense(64, activation="relu"))
+    model.add(tf.keras.layers.Dense(10, activation="softmax"))
+
     model.summary()
-    
-    model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
-    
+
+    model.compile(
+        optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
+    )
+
     return model
 
 
 def build_and_compile_cnn_model_with_dropout():
     print("Training CNN model with dropout")
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Input(shape=(28, 28, 1), name='image_bytes'))
-    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Input(shape=(28, 28, 1), name="image_bytes"))
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation="relu"))
     model.add(tf.keras.layers.MaxPooling2D((2, 2)))
-    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation="relu"))
     model.add(tf.keras.layers.MaxPooling2D((2, 2)))
     model.add(tf.keras.layers.Dropout(0.5))
-    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation="relu"))
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(64, activation='relu'))
-    model.add(tf.keras.layers.Dense(10, activation='softmax'))
-    
+    model.add(tf.keras.layers.Dense(64, activation="relu"))
+    model.add(tf.keras.layers.Dense(10, activation="softmax"))
+
     model.summary()
-    
-    model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
-    
+
+    model.compile(
+        optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
+    )
+
     return model
 
 
 def main(args):
-   
+
     strategy = tf.distribute.MultiWorkerMirroredStrategy()
     BATCH_SIZE_PER_REPLICA = 64
     BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
@@ -110,7 +115,9 @@ def main(args):
         dataset = mnist_dataset().batch(BATCH_SIZE).repeat()
 
         options = tf.data.Options()
-        options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+        options.experimental_distribute.auto_shard_policy = (
+            tf.data.experimental.AutoShardPolicy.DATA
+        )
         dataset = dataset.with_options(options)
 
         model_type = args.model_type
@@ -121,7 +128,6 @@ def main(args):
             multi_worker_model = build_and_compile_cnn_model_with_batch_norm()
         elif model_type == "cnn_dropout":
             multi_worker_model = build_and_compile_cnn_model_with_dropout()
-            
 
     # Define the checkpoint directory to store the checkpoints
     checkpoint_dir = args.checkpoint_dir
@@ -131,21 +137,23 @@ def main(args):
 
     class PrintLR(tf.keras.callbacks.Callback):
         def on_epoch_end(self, epoch, logs=None):
-            print('\nLearning rate for epoch {} is {}'.format(        epoch + 1, multi_worker_model.optimizer.lr.numpy()))
+            print(
+                "\nLearning rate for epoch {} is {}".format(
+                    epoch + 1, multi_worker_model.optimizer.lr.numpy()
+                )
+            )
 
     callbacks = [
-      tf.keras.callbacks.TensorBoard(log_dir='./logs'),
-      tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_prefix,
-                                         save_weights_only=True),
-      tf.keras.callbacks.LearningRateScheduler(decay),
-      PrintLR()
+        tf.keras.callbacks.TensorBoard(log_dir="./logs"),
+        tf.keras.callbacks.ModelCheckpoint(
+            filepath=checkpoint_prefix, save_weights_only=True
+        ),
+        tf.keras.callbacks.LearningRateScheduler(decay),
+        PrintLR(),
     ]
 
-    multi_worker_model.fit(dataset,
-                           epochs=1,
-                           steps_per_epoch=70,
-                           callbacks=callbacks)
-    
+    multi_worker_model.fit(dataset, epochs=1, steps_per_epoch=70, callbacks=callbacks)
+
     def _is_chief():
         return TASK_INDEX == 0
 
@@ -154,30 +162,28 @@ def main(args):
 
     else:
         # Save to a path that is unique across workers.
-        model_path = args.saved_model_dir + '/worker_tmp_' + str(TASK_INDEX)
+        model_path = args.saved_model_dir + "/worker_tmp_" + str(TASK_INDEX)
 
     multi_worker_model.save(model_path)
 
 
-if __name__ == '__main__':
-    tf_config = json.loads(os.environ.get('TF_CONFIG') or '{}')
-    TASK_INDEX = tf_config['task']['index']
+if __name__ == "__main__":
+    tf_config = json.loads(os.environ.get("TF_CONFIG") or "{}")
+    TASK_INDEX = tf_config["task"]["index"]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--saved_model_dir',
-                        type=str,
-                        required=True,
-                        help='Tensorflow export directory')
+    parser.add_argument(
+        "--saved_model_dir", type=str, required=True, help="Tensorflow export directory"
+    )
 
-    parser.add_argument('--checkpoint_dir',
-                        type=str,
-                        required=True,
-                        help='Tensorflow checkpoint directory')
+    parser.add_argument(
+        "--checkpoint_dir",
+        type=str,
+        required=True,
+        help="Tensorflow checkpoint directory",
+    )
 
-    parser.add_argument('--model_type',
-                        type=str,
-                        required=True,
-                        help='Model type')
+    parser.add_argument("--model_type", type=str, required=True, help="Model type")
 
     parsed_args = parser.parse_args()
     main(parsed_args)

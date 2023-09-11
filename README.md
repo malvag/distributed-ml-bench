@@ -7,7 +7,7 @@ Why distributed systems? Distributing machine learning systems allows developers
 We will automate machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow.
 
 Our goal is to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads.
- 
+
 ## Setup
 
 I'm using a mac and brew to install the tools. We are going to install Tensorflow, Docker, kubectl, and k3d which is a lightweight wrapper for k3s which is lightweight Kubernetes.
@@ -105,7 +105,7 @@ kubens kubeflow
 
 ## Introduction
 
-We are building an image classification end-to-end machine learning system. 
+We are building an image classification end-to-end machine learning system.
 
 ## System Architecture
 
@@ -181,7 +181,7 @@ def build_and_compile_cnn_model():
       tf.keras.layers.Dense(64, activation='relu'),
       tf.keras.layers.Dense(10)
     ])
-  
+
   model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                 optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
                 metrics=['accuracy'])
@@ -391,7 +391,7 @@ Let's start the pods and train our distributed model. We can see the logs from t
 
 ## Model Selection
 
-We've implemented the distributed model training component. In production, we might need to train different models and pick the top performer for model serving. Let's create two more models to understand this concept. 
+We've implemented the distributed model training component. In production, we might need to train different models and pick the top performer for model serving. Let's create two more models to understand this concept.
 
 ```python
 def build_and_compile_cnn_model_with_batch_norm():
