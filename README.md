@@ -262,11 +262,80 @@ RUN pip install tensorflow==2.12.0 tensorflow_datasets==4.9.2
 COPY multi-worker-distributed-training.py /
 ```
 
-We then build the image from the dockerfile and import it to the k3d cluster as it does not have access to the image registry.
+We then build the image from the dockerfile and import it to the k3d cluster as it cannot access the image registry.
 
 ```bash
 docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .
 k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml
+```
+
+Now when the pods are completed/failed, all files in the pods are recycled by the Kubernetes garbage collection. So all the model checkpoints are lost and we don't have a model for serving. To avoid this we use PersistentVolume(PV) and PersistentVolumeClaim(PVC).
+
+A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes but have a lifecycle independent of any individual Pod that uses the PV. This means that PV will persist and live even when the pods are deleted.
+
+A PersistentVolumeClaim (PVC) is a request for storage by a user. It is similar to a Pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory). Claims can request specific size and access modes (e.g., they can be mounted ReadWriteOnce, ReadOnlyMany or ReadWriteMany).
+
+We can create a PVC to submit a request for storage that will be used in worker pods to store the trained model. Here we are requesting 1GB storage with ReadWriteOnce mode.
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: volume
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+Next, we create the PVC.
+
+```bash
+kubectl create -f multi-worker-pvc.yaml
+```
+
+Next, we will define a TFJob specification with the image we built before that contains the distributed training script.
+
+```yaml
+apiVersion: kubeflow.org/v1
+kind: TFJob
+metadata:
+  name: multi-worker-training
+spec:
+  runPolicy:
+    cleanPodPolicy: None
+  tfReplicaSpecs:
+    Worker:
+      replicas: 2
+      restartPolicy: Never
+      template:
+        spec:
+          containers:
+            - name: tensorflow
+              image: kubeflow/multi-worker-strategy:v0.1
+              imagePullPolicy: IfNotPresent
+              command: ["python", "/multi-worker-distributed-training.py", "--saved_model_dir", "/trained_model/saved_model_versions/2/", "--checkpoint_dir", "/trained_model/checkpoint"]
+              volumeMounts:
+                - mountPath: /trained_model
+                  name: training
+              resources:
+                limits:
+                  cpu: 500m
+          volumes:
+            - name: training
+              persistentVolumeClaim:
+                claimName: volume
+```
+
+We pass the arguments (`saved_model_dir`, `checkpoint_dir`) to the container. The `volumes` field specifies the persistent volume claim and `volumeMounts` field specifies what folder to mount the files. The `CleanPodPolicy` in the TFJob spec controls the deletion of pods when a job terminates. The `restartPolicy` determines whether pods will be restarted when they exit.
+
+Next, We can submit this TFJob to our cluster and start our distributed model training.
+
+```bash
+kubectl create -f multi-worker-tfjob.yaml
 ```
 
 ## Model Serving
