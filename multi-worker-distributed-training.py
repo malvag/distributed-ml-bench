@@ -21,7 +21,7 @@ def mnist_dataset():
 
     return mnist_train.map(scale).cache().shuffle(BUFFER_SIZE)
 
-
+# Learning rate decay
 def decay(epoch):
     if epoch < 3:
         return 1e-3
@@ -41,6 +41,8 @@ def build_and_compile_cnn_model():
       tf.keras.layers.Dense(64, activation='relu'),
       tf.keras.layers.Dense(10)
     ])
+
+    model.summary()
   
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                 optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
@@ -51,20 +53,20 @@ def build_and_compile_cnn_model():
 # Sequential API
 def build_and_compile_cnn_model_with_batch_norm():
     print("Training CNN model with batch normalization")
-    model = models.Sequential()
-    model.add(layers.Input(shape=(28, 28, 1), name='image_bytes'))
-    model.add(layers.Conv2D(32, (3, 3), activation='relu'))
-    model.add(layers.BatchNormalization())
-    model.add(layers.Activation('sigmoid'))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-    model.add(layers.BatchNormalization())
-    model.add(layers.Activation('sigmoid'))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-    model.add(layers.Flatten())
-    model.add(layers.Dense(64, activation='relu'))
-    model.add(layers.Dense(10, activation='softmax'))
+    model = tf.keras.models.Sequential()
+    model.add(tf.keras.layers.Input(shape=(28, 28, 1), name='image_bytes'))
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.BatchNormalization())
+    model.add(tf.keras.layers.Activation('sigmoid'))
+    model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.BatchNormalization())
+    model.add(tf.keras.layers.Activation('sigmoid'))
+    model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Flatten())
+    model.add(tf.keras.layers.Dense(64, activation='relu'))
+    model.add(tf.keras.layers.Dense(10, activation='softmax'))
     
     model.summary()
     
@@ -77,17 +79,17 @@ def build_and_compile_cnn_model_with_batch_norm():
 
 def build_and_compile_cnn_model_with_dropout():
     print("Training CNN model with dropout")
-    model = models.Sequential()
-    model.add(layers.Input(shape=(28, 28, 1), name='image_bytes'))
-    model.add(layers.Conv2D(32, (3, 3), activation='relu'))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Dropout(0.5))
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-    model.add(layers.Flatten())
-    model.add(layers.Dense(64, activation='relu'))
-    model.add(layers.Dense(10, activation='softmax'))
+    model = tf.keras.models.Sequential()
+    model.add(tf.keras.layers.Input(shape=(28, 28, 1), name='image_bytes'))
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+    model.add(tf.keras.layers.Dropout(0.5))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Flatten())
+    model.add(tf.keras.layers.Dense(64, activation='relu'))
+    model.add(tf.keras.layers.Dense(10, activation='softmax'))
     
     model.summary()
     
@@ -116,7 +118,7 @@ def main(args):
         if model_type == "cnn":
             multi_worker_model = build_and_compile_cnn_model()
         elif model_type == "cnn_batchnorm":
-            multi_worker_model = build_and_compile_cnn_model_with_batch_normalization()
+            multi_worker_model = build_and_compile_cnn_model_with_batch_norm()
         elif model_type == "cnn_dropout":
             multi_worker_model = build_and_compile_cnn_model_with_dropout()
             
