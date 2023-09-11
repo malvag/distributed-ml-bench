@@ -33,6 +33,9 @@ k3d cluster create dist-ml
 kubectl get nodes
 ```
 
+<img width="794" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/d9345b11-6fce-49f0-8ef6-36a999840d0c">
+
+
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
 - `brew install kubectx`
 
@@ -42,7 +45,7 @@ kubectl get nodes
 
 [7] We wil also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end to end machine learning workflows
 
-For example if you want to create a kubernetes pod, then create a hello-world.yaml and then do `kubectl create -f hello-world.yaml` 
+For example if you want to create a kubernetes pod, then create a hello-world.yaml as below.
 
 ```yaml
 apiVersion: v1
@@ -57,14 +60,48 @@ spec:
     args: ["hello world"]
 ```
 
-then `kubectl get pods`
+Next, submit the job to our cluster
 
-to see what is being printed out in the container, you can do  `kubectl logs whalesay`
+```bash
+kubectl create -f hello-world.yaml
+```
 
-If you want to get the details of a single pod with the raw yaml, then do `kubectl get pod whalesay -o yaml`
+We can see the statuses
+
+```bash
+kubectl get pods
+```
+
+We can see what is being printed out in the container
+
+```bash
+kubectl logs whalesay
+```
+
+If you want to get the details of a single pod with the raw yaml, then enter the following command
+
+```bash
+kubectl get pod whalesay -o yaml
+```
+
 You can get the JSON or any other format as well.
 
-Create a namespace using `kubectl create namespace kubeflow`
+Next, we create a namespace. The namespaces provide a mechanism for isolating groups of resources within a single cluster.
+
+To create a namespace
+
+```bash
+kubectl create namespace kubeflow
+```
+
+Next, switch to kubeflow
+
+```bash
+kubens kubeflow
+```
+
+<img width="603" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/54f180ee-bc0a-4e8f-873f-0be8ed5cbbe8">
+
 
 ## Introduction
 
