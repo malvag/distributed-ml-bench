@@ -444,7 +444,7 @@ def build_and_compile_cnn_model_with_dropout():
   return model
 ```
 
-We train these models by submitting three different TFJobs with an argument `--model-type`.
+We train these models by submitting three different TFJobs with an argument `--model_type`.
 
 Next, we load the testing data and the trained model to evaluate its performance. The model with the highest accuracy score can be moved to a different folder and used for model serving.
 
