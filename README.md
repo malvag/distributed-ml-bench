@@ -474,4 +474,25 @@ dst = "trained_model/saved_model_versions/3"
 shutil.copytree(best_model_path, dst)
 ```
 
+We add this script to the Dockerfilw, rebuild the image, and create a pod that runs model serving.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: model-selection
+spec:
+  containers:
+  - name: predict
+    image: kubeflow/multi-worker-strategy:v0.1
+    command: ["python", "/model-selection.py"]
+    volumeMounts:
+    - name: model
+      mountPath: /trained_model
+  volumes:
+  - name: model
+    persistentVolumeClaim:
+      claimName: strategy-volume
+```
+
 ## End-to-end Workflow
