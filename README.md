@@ -173,6 +173,7 @@ Now we have created a data ingestion component for distributed ingestion and hav
 
 ```python
 def build_and_compile_cnn_model():
+  print("Training CNN model")
   model = tf.keras.Sequential([
       tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(28, 28, 1)),
       tf.keras.layers.MaxPooling2D(),
@@ -375,10 +376,93 @@ Next, we submit this TFJob to our cluster and start our distributed model traini
 kubectl create -f multi-worker-tfjob.yaml
 ```
 
-Let's start the pods and train our distributed model.
+Let's start the pods and train our distributed model. We can see the logs from the pods below.
 
 
 
 ## Model Serving
+
+We've implemented the distributed model training component. In production, we might need to train different models and pick the top performer for model serving. Let's create two more models to understand this concept. 
+
+```python
+def build_and_compile_cnn_model_with_batch_norm():
+  print("Training CNN model with batch normalization")
+  model = models.Sequential()
+  model.add(layers.Input(shape=(28, 28, 1), name='image_bytes'))
+  model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+  model.add(layers.BatchNormalization())
+  model.add(layers.Activation('sigmoid'))
+  model.add(layers.MaxPooling2D((2, 2)))
+  model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+  model.add(layers.BatchNormalization())
+  model.add(layers.Activation('sigmoid'))
+  model.add(layers.MaxPooling2D((2, 2)))
+  model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+  model.add(layers.Flatten())
+  model.add(layers.Dense(64, activation='relu'))
+  model.add(layers.Dense(10, activation='softmax'))
+
+  model.summary()
+
+  model.compile(optimizer='adam',
+                loss='sparse_categorical_crossentropy',
+                metrics=['accuracy'])
+
+  return model
+```
+
+```python
+def build_and_compile_cnn_model_with_dropout():
+  print("Training CNN model with dropout")
+  model = models.Sequential()
+  model.add(layers.Input(shape=(28, 28, 1), name='image_bytes'))
+  model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+  model.add(layers.MaxPooling2D((2, 2)))
+  model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+  model.add(layers.MaxPooling2D((2, 2)))
+  model.add(layers.Dropout(0.5))
+  model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+  model.add(layers.Flatten())
+  model.add(layers.Dense(64, activation='relu'))
+  model.add(layers.Dense(10, activation='softmax'))
+
+  model.summary()
+
+  model.compile(optimizer='adam',
+                loss='sparse_categorical_crossentropy',
+                metrics=['accuracy'])
+
+  return model
+```
+
+We train these models by submitting three different TFJobs with an argument `--model-type`.
+
+Next, we load the testing data and the trained model to evaluate its performance. The model with the highest accuracy score can be moved to a different folder and used for model serving.
+
+```python
+def scale(image, label):
+  image = tf.cast(image, tf.float32)
+  image /= 255
+  return image, label
+
+best_model_path = ""
+best_accuracy = 0
+
+for i in range(3):
+  model_path = "trained_models/saved_model_versions/" + str(i)
+  model = tf.keras.models.load_model(model_path)
+
+  datasets, info = tfds.load(name='mnist', with_info=True, as_supervised=True)
+  mnist_test = datasets['test']
+  ds = mnist_test.map(scale).cache().shuffle(BUFFER_SIZE).batch(64)
+  loss, accuracy = model.evaluate(ds)
+
+  if accuracy > best_accuracy:
+    best_accuracy = accuracy
+    best_model_path = model_path
+
+dst = "trained_model/saved_model_versions/3"
+shutil.copytree(best_model_path, dst)
+```
 
 ## End-to-end Workflow
