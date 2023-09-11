@@ -332,7 +332,7 @@ spec:
 
 We pass the arguments (`saved_model_dir`, `checkpoint_dir`) to the container. The `volumes` field specifies the persistent volume claim and `volumeMounts` field specifies what folder to mount the files. The `CleanPodPolicy` in the TFJob spec controls the deletion of pods when a job terminates. The `restartPolicy` determines whether pods will be restarted when they exit.
 
-Next, We can submit this TFJob to our cluster and start our distributed model training.
+Next, we submit this TFJob to our cluster and start our distributed model training.
 
 ```bash
 kubectl create -f multi-worker-tfjob.yaml
