@@ -1,0 +1,33 @@
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+import tensorflow_datasets as tfds
+import shutil
+import os
+
+
+def scale(image, label):
+  image = tf.cast(image, tf.float32)
+  image /= 255
+  return image, label
+
+best_model_path = ""
+best_accuracy = 0
+
+for i in range(3):
+  model_path = "trained_model/saved_model_versions/" + str(i)
+  model = keras.models.load_model(model_path)
+  datasets, info = tfds.load(name='fashion_mnist', with_info=True, as_supervised=True)
+  mnist_test = datasets['test']
+  ds = mnist_test.map(scale).cache().shuffle(10000).batch(64)
+  loss, accuracy = model.evaluate(ds)
+  if accuracy > best_accuracy:
+    best_accuracy = accuracy
+    best_model_path = model_path
+
+destination = "trained_model/saved_model_versions/3"
+if os.path.exists(destination):
+  shutil.rmtree(destination)
+
+shutil.copytree(best_model_path, destination)
+print(f"Best model with accuracy {best_accuracy} is copied to {destination}")
