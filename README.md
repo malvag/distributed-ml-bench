@@ -300,12 +300,21 @@ RUN pip install tensorflow==2.12.0 tensorflow_datasets==4.9.2
 COPY multi-worker-distributed-training.py /
 ```
 
-We then build the image from the dockerfile and import it to the k3d cluster as it cannot access the image registry.
+We then build the image from the dockerfile.
 
 ```bash
 docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .
+```
+
+<img width="865" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/f4a6fbdb-0704-4f61-963d-b876874a2183">
+
+Next, import the above image to the k3d cluster as it cannot access the image registry.
+
+```bash
 k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml
 ```
+
+<img width="861" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/c96adade-741e-4bd6-a958-49007917a844">
 
 Now when the pods are completed/failed, all files in the pods are recycled by the Kubernetes garbage collection. So all the model checkpoints are lost and we don't have a model for serving. To avoid this we use PersistentVolume(PV) and PersistentVolumeClaim(PVC).
 
