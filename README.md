@@ -389,7 +389,7 @@ Let's start the pods and train our distributed model. We can see the logs from t
 
 
 
-## Model Serving
+## Model Selection
 
 We've implemented the distributed model training component. In production, we might need to train different models and pick the top performer for model serving. Let's create two more models to understand this concept. 
 
@@ -493,6 +493,21 @@ spec:
   - name: model
     persistentVolumeClaim:
       claimName: strategy-volume
+```
+
+## Model Serving
+
+We implemented distributed training and model selection. Now we implement the model serving component. Here we take the trained model from `trained_model/saved_model_versions/3`. The model serving should be very performant.
+
+### Single server model inference
+
+```python
+model_path = "trained_models/saved_model_versions/3"
+model = tf.keras.models.load_model(model_path)
+datasets, info = tfds.load(name='mnist', with_info=True, as_supervised=True)
+mnist_test = datasets['test']
+ds = mnist_test.map(scale).cache().shuffle(BUFFER_SIZE).batch(64)
+loss, accuracy = model.predict(ds)
 ```
 
 ## End-to-end Workflow
