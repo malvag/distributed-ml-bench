@@ -551,12 +551,43 @@ signatures = {
 tf.saved_model.save(multi_worker_model, model_path, signatures=signatures)
 ```
 
-Next, we'll send a predict request as a POST to our server's REST endpoint, and pass it as an example.
+Now we have updated the training script so we should rebuild the image and re-train the model.
 
-```python
+Next, we will use KServe for inference service. [KServe](https://www.kubeflow.org/docs/external-add-ons/kserve/kserve/) enables serverless inferencing on Kubernetes and provides performant, high-abstraction interfaces for common machine learning (ML) frameworks like TensorFlow, PyTorch, etc. [Refer](https://kserve.github.io/website/0.11/modelserving/v1beta1/tensorflow/).
 
+We create an InferenceService yaml which specifies the framework tensorflow and storageUri that is pointed to a saved tensorflow model.
+
+```yaml
+apiVersion: "serving.kserve.io/v1beta1"
+kind: "InferenceService"
+metadata:
+  name: "flower-sample"
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: tensorflow
+      storageUri: "pvc://strategy-volume/saved_model_versions"
 ```
 
+Install KServe
 
+```bash
+curl -s "https://raw.githubusercontent.com/kserve/kserve/release-0.11/hack/quick_install.sh" | bash
+```
+
+Next, apply the inference-service.yaml to create the InferenceService. By default, it exposes an HTTP/REST endpoint.
+
+```bash
+kubectl apply -f inference-service.yaml
+```
+
+Wait for the InferenceService to be in a ready state.
+
+```bash
+kubectl get isvc flower-sample
+```
+
+Next, we run the prediction. But first, we need to determine and set the INGRESS_HOST and INGRESS_PORT. 
 
 ## End-to-end Workflow
