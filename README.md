@@ -510,7 +510,7 @@ ds = mnist_test.map(scale).cache().shuffle(BUFFER_SIZE).batch(64)
 loss, accuracy = model.predict(ds)
 ```
 
-We use [TFServing](https://keras.io/examples/keras_recipes/tf_serving/) to expose our model as an endpoint service. You can check the installation process [here](https://www.tensorflow.org/tfx/serving/setup).
+We can also use [TFServing](https://keras.io/examples/keras_recipes/tf_serving/) to expose our model as an endpoint service. You can check the installation process [here](https://www.tensorflow.org/tfx/serving/setup).
 
 ```bash
 # Environment variable with the path to the model
@@ -525,12 +525,38 @@ nohup tensorflow_model_server \
 
 _Nohup, short for no hang up is a command in Linux systems that keeps processes running even after exiting the shell or terminal._
 
-There are more efficient ways for distributed model serving.
+The method mentioned above works great if we're only experimenting locally. There are more efficient ways for distributed model serving.
+
+TensorFlow models contain a signature definition that defines the signature of a computation supported in a TensorFlow graph. SignatureDefs aims to provide generic support to identify the inputs and outputs of a function. We can modify this input layer with a preprocessing function so that clients can use base64 encoded images, which is a standard way of sending images through RESTFUL APIs. To do that, we’ll save a model with new serving signatures. The new signatures use Python functions to handle preprocessing the image from a JPEG to a Tensor. [Refer](https://cloud.google.com/blog/topics/developers-practitioners/add-preprocessing-functions-tensorflow-models-and-deploy-vertex-ai)
+
+```python
+def _preprocess(bytes_inputs):
+    decoded = tf.io.decode_jpeg(bytes_inputs, channels=1)
+    resized = tf.image.resize(decoded, size=(28, 28))
+    return tf.cast(resized, dtype=tf.uint8)
+
+def _get_serve_image_fn(model):
+    @tf.function(input_signature=[tf.TensorSpec([None], tf.string)])
+    def serve_image_fn(bytes_inputs):
+        decoded_images = tf.map_fn(_preprocess, bytes_inputs, dtype=tf.uint8)
+        return model(decoded_images)
+    return serve_image_fn
+
+signatures = {
+    "serving_default": _get_serve_image_fn(model).get_concrete_function(
+        tf.TensorSpec(shape=[None], dtype=tf.string)
+    )
+}
+
+tf.saved_model.save(multi_worker_model, model_path, signatures=signatures)
+```
 
 Next, we'll send a predict request as a POST to our server's REST endpoint, and pass it as an example.
 
 ```python
 
 ```
+
+
 
 ## End-to-end Workflow
