@@ -510,7 +510,7 @@ ds = mnist_test.map(scale).cache().shuffle(BUFFER_SIZE).batch(64)
 loss, accuracy = model.predict(ds)
 ```
 
-We use [TFServing](https://keras.io/examples/keras_recipes/tf_serving/) to expose our model as an endpoint service.
+We use [TFServing](https://keras.io/examples/keras_recipes/tf_serving/) to expose our model as an endpoint service. You can check the installation process [here](https://www.tensorflow.org/tfx/serving/setup).
 
 ```bash
 # Environment variable with the path to the model
@@ -524,6 +524,8 @@ nohup tensorflow_model_server \
 ```
 
 _Nohup, short for no hang up is a command in Linux systems that keeps processes running even after exiting the shell or terminal._
+
+There are more efficient ways for distributed model serving.
 
 Next, we'll send a predict request as a POST to our server's REST endpoint, and pass it as an example.
 
