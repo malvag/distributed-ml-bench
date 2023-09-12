@@ -555,7 +555,7 @@ Now we have updated the training script so we should rebuild the image and re-tr
 
 Next, we will use KServe for inference service. [KServe](https://www.kubeflow.org/docs/external-add-ons/kserve/kserve/) enables serverless inferencing on Kubernetes and provides performant, high-abstraction interfaces for common machine learning (ML) frameworks like TensorFlow, PyTorch, etc. [Refer](https://kserve.github.io/website/0.11/modelserving/v1beta1/tensorflow/).
 
-We create an InferenceService yaml which specifies the framework tensorflow and storageUri that is pointed to a saved tensorflow model.
+We create an [InferenceService](https://kserve.github.io/website/0.11/get_started/first_isvc/#run-your-first-inferenceservice) yaml which specifies the framework tensorflow and storageUri that is pointed to a saved tensorflow model.
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
@@ -588,6 +588,18 @@ Wait for the InferenceService to be in a ready state.
 kubectl get isvc flower-sample
 ```
 
-Next, we run the prediction. But first, we need to determine and set the INGRESS_HOST and INGRESS_PORT. 
+Next, we run the prediction. But first, we need to determine and set the INGRESS_HOST and INGRESS_PORT. Basically, an ingress gateway is like an API gateway that load-balances requests. To test it locally we have to do `Port Forward`.
+
+```bash
+INGRESS_GATEWAY_SERVICE=$(kubectl get svc --namespace istio-system --selector="app=istio-ingressgateway" --output jsonpath='{.items[0].metadata.name}')
+kubectl port-forward --namespace istio-system svc/${INGRESS_GATEWAY_SERVICE} 8080:80
+```
+
+Then do the following
+
+```bash
+export INGRESS_HOST=localhost
+export INGRESS_PORT=8080
+```
 
 ## End-to-end Workflow
