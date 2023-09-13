@@ -45,6 +45,9 @@ kubectl get nodes
 
 [7] We wil also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end to end machine learning workflows
 
+
+### Basics
+
 For example if you want to create a kubernetes pod, then create a hello-world.yaml as below.
 
 ```yaml
@@ -101,7 +104,6 @@ kubens kubeflow
 ```
 
 <img width="603" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/54f180ee-bc0a-4e8f-873f-0be8ed5cbbe8">
-
 
 ## Introduction
 
@@ -474,7 +476,7 @@ dst = "trained_model/saved_model_versions/3"
 shutil.copytree(best_model_path, dst)
 ```
 
-We add this script to the Dockerfilw, rebuild the image, and create a pod that runs model serving.
+We add this script to the Dockerfile, rebuild the image, and create a pod that runs the script for model selection.
 
 ```yaml
 apiVersion: v1
