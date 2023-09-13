@@ -602,4 +602,18 @@ export INGRESS_HOST=localhost
 export INGRESS_PORT=8080
 ```
 
+We can send a sample request to our inference service. We can curl.
+
+```bash
+SERVICE_HOSTNAME=$(kubectl get inferenceservice sklearn-iris -n kserve-test -o jsonpath='{.status.url}' | cut -d "/" -f 3)
+curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/flower-sample:predict -d @./mnist-input.json
+```
+
+or we use requests.
+
+```python
+response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/flower-sample:predict", json=mnist-input.json, headers={"Host": "flower-sample.kubeflow.example.com"})
+print(response.text)
+```
+
 ## End-to-end Workflow
