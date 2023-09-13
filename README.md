@@ -27,6 +27,7 @@ brew install kubectl
 [4] We will use Kubernetes as our core distributed infrastructure. In fact, we will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker. Its great for local Kubernetes development.
 
 To install k3d:
+
 ```bash
 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash
 k3d cluster create dist-ml
@@ -37,7 +38,10 @@ kubectl get nodes
 
 
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
-- `brew install kubectx`
+
+```bash
+brew install kubectx
+```
 
 [6] We will use [Kubeflow](https://www.kubeflow.org) to submit jobs to the Kubernetes cluster. Install Kubeflow training operator to run distributed TensorFlow jobs on Kubernetes.
 
@@ -45,7 +49,11 @@ kubectl get nodes
 
 [7] We will also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end-to-end machine learning workflows. Install Argo workflows.
 
-### Basics
+```bash
+kubectl kustomize manifests | kubectl apply -f -
+```
+
+## Some Basics
 
 For example if you want to create a kubernetes pod, then create a hello-world.yaml as below.
 
@@ -388,7 +396,9 @@ kubectl create -f multi-worker-tfjob.yaml
 
 Let's start the pods and train our distributed model. We can see the logs from the pods below.
 
-
+```bash
+kubectl logs multi-worker-training-worker-0
+```
 
 ## Model Selection
 
