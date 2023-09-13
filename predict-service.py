@@ -16,5 +16,4 @@ datasets, _ = tfds.load(name="fashion_mnist", with_info=True, as_supervised=True
 
 ds = datasets["test"].map(scale).cache().shuffle(10000).batch(64)
 
-# TODO: Visualize the images and compare with the classified result
 model.predict(ds)
