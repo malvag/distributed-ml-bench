@@ -39,12 +39,19 @@ kubectl get nodes
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
 - `brew install kubectx`
 
-[6] We will use [Kubeflow](https://www.kubeflow.org) to submit jobs to the Kubernetes cluster
+[6] We will use [Kubeflow](https://www.kubeflow.org) to submit jobs to the Kubernetes cluster. Install Kubeflow training operator to run distributed TensorFlow jobs on Kubernetes.
+
+```bash
+kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.5.0"
+```
 
 ![Kubeflow UI](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/aa731d8d-93cf-4089-a7a4-4a9b0f47e4eb "https://www.kubeflow.org/docs/started/architecture/")
 
-[7] We wil also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end to end machine learning workflows
+[7] We wil also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end-to-end machine learning workflows. Install Argo workflows.
 
+```bash
+kubectl apply -n argo -f https://github.com/argoproj/argo-workflows/releases/download/v3.4.11/install.yaml
+```
 
 ### Basics
 
