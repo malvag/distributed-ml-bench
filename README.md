@@ -50,7 +50,7 @@ kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/stand
 [7] We wil also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end-to-end machine learning workflows. Install Argo workflows.
 
 ```bash
-kubectl apply -n argo -f https://github.com/argoproj/argo-workflows/releases/download/v3.4.11/install.yaml
+kubectl apply -f https://github.com/argoproj/argo-workflows/releases/download/v3.4.11/install.yaml
 ```
 
 ### Basics
