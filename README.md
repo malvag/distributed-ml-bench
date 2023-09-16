@@ -624,12 +624,14 @@ response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mn
 ```
 
 # [TODO]
+inference-request.py
 
 ## Replicated model servers inference
 
 Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests. 
 
 # [TODO]
+kserve autoscale
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
@@ -655,10 +657,12 @@ hey -z 30s -q 50 -m POST -host ${SERVICE_HOSTNAME} -D $INPUT_PATH http://${INGRE
 ```
 
 # [TODO]
+load testing with hey
 
 ## End-to-end Workflow
 
 # [TODO]
+why? how?
 
 I'm creating an end-to-end workflow with 4 steps:
 1. Data Ingestion 
@@ -695,6 +699,7 @@ volumes:
 ```
 
 # [TODO] 
+steps
 podGC
 OnPodSuccess
 
@@ -708,7 +713,7 @@ OnPodSuccess
 
 [4] [First InferenceService](https://kserve.github.io/website/0.7/get_started/first_isvc/#5-run-performance-test)
 
-[5] [Autoscale InferenceService with inference workload](https://kserve.github.io/website/0.8/modelserving/autoscaling/autoscaling
+[5] [Autoscale InferenceService with inference workload](https://kserve.github.io/website/0.8/modelserving/autoscaling/autoscaling)
 
 [6] [Hey](https://github.com/rakyll/hey)
 
