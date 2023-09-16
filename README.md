@@ -623,8 +623,87 @@ or we use requests.
 response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict", json=mnist-input.json, headers={"Host": "tf-mnist.kubeflow.example.com"})
 ```
 
+# [TODO]
+
+## Replicated model servers inference
+
+Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests. 
+
+# [TODO]
+
+```yaml
+apiVersion: "serving.kserve.io/v1beta1"
+kind: "InferenceService"
+metadata:
+  name: "tf-mnist"
+  annotations:
+    autoscaling.knative.dev/target: "1"
+spec:
+  predictor:
+    containerConcurrency: 1
+    model:
+      modelFormat:
+        name: tensorflow
+      storageUri: "pvc://strategy-volume/saved_model_versions"
+```
+
+Next, I install `Hey`, a tiny program that sends some load to a web application. Install it with `brew install hey`
+
+```bash
+SERVICE_HOSTNAME=$(kubectl get inferenceservice tf-mnist -n kubeflow -o jsonpath='{.status.url}' | cut -d "/" -f 3)
+hey -z 30s -q 50 -m POST -host ${SERVICE_HOSTNAME} -D $INPUT_PATH http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict
+```
+
+# [TODO]
+
 ## End-to-end Workflow
+
+# [TODO]
+
+I'm creating an end-to-end workflow with 4 steps:
+1. Data Ingestion 
+2. Distributed Training
+3. Model Selection
+4. Model Serving
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow                  # new type of k8s spec
+metadata:
+  generateName: tfjob-wf-    # name of the workflow spec
+spec:
+  entrypoint: tfjob-wf          # invoke the tfjob template
+  templates:
+  - name: tfjob-wf
+    # Instead of just running a container
+    # This template has a sequence of steps
+    steps:
+    - - name: data-ingestion-step            # data-ingestion-step is run before the following steps
+        template: data-ingestion
+    - - name: distributed-training-step      # double dash => run after previous step
+        template: distributed-training
+    - - name: model-selection-step           
+        template: model-selection
+    - - name: model-serving-step
+        template: model-serving
+volumes:
+- name: workdir
+  persistentVolumeClaim:
+    claimName: strategy-volume
+```
 
 ## References
 
-[1] Distributed ML Patterns
+[1] [Distributed ML Patterns](https://www.manning.com/books/distributed-machine-learning-patterns?utm_source=terrytangyuan&utm_medium=affiliate&utm_campaign=book_tang_distributed_6_10_21&a_aid=terrytangyuan&a_bid=9b134929)
+
+[2] [Multi-worker training with Keras](https://www.tensorflow.org/tutorials/distribute/multi_worker_with_keras)
+
+[3] [Distributed training with Keras](https://www.tensorflow.org/tutorials/distribute/keras)
+
+[4] [First InferenceService](https://kserve.github.io/website/0.7/get_started/first_isvc/#5-run-performance-test)
+
+[5] [Autoscale InferenceService with inference workload](https://kserve.github.io/website/0.8/modelserving/autoscaling/autoscaling
+
+[6] [Hey](https://github.com/rakyll/hey)
+
+[7] [Argo Workflows](https://argoproj.github.io/argo-workflows/)
