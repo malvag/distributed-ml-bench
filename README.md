@@ -1,16 +1,16 @@
 # Distributed ML Systems
 
-Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. So I wanted to build it again to deepen my understanding.
+Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. I wanted to build it again on a much simpler dataset to deepen my understanding.
 
-Why distributed systems? Distributing machine learning systems allows developers to handle extremely large datasets across multiple clusters, take advantage of automation tools, and benefit from hardware accelerations. This repo includes code and references to implement a scalable and reliable machine learning system.
+## Introduction
 
-We will automate machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow.
+Why distributed systems? Distributing machine learning systems allows developers to handle huge datasets across multiple clusters, take advantage of automation tools, and benefit from hardware accelerations. This repo includes code and references to implement a scalable and reliable machine learning system.
 
-Our goal is to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads.
+I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. My goal is to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. I'm building an image classification end-to-end machine learning system.
 
 ## Setup
 
-I'm using a mac and brew to install the tools. We are going to install Tensorflow, Docker, kubectl, and k3d which is a lightweight wrapper for k3s which is lightweight Kubernetes.
+I'm using a Mac and Homebrew to install the tools. We will install Tensorflow, Docker, kubectl, and k3d, a lightweight wrapper for k3s, which is lightweight Kubernetes.
 
 [1] We will be using [TensorFlow](https://www.tensorflow.org) for data processing, model building and evaluation
 ```bash
@@ -112,11 +112,9 @@ kubens kubeflow
 
 <img width="603" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/54f180ee-bc0a-4e8f-873f-0be8ed5cbbe8">
 
-## Introduction
+## System Architecture
 
 We are building an image classification end-to-end machine learning system.
-
-## System Architecture
 
 <img width="1143" alt="Screenshot 2023-06-30 at 12 50 13 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/18bb1322-1970-4ef4-a3a6-f7d345623ee0">
 
@@ -572,7 +570,7 @@ We create an [InferenceService](https://kserve.github.io/website/0.11/get_starte
 apiVersion: "serving.kserve.io/v1beta1"
 kind: "InferenceService"
 metadata:
-  name: "flower-sample"
+  name: "tf-mnist"
 spec:
   predictor:
     model:
@@ -596,7 +594,7 @@ kubectl apply -f inference-service.yaml
 Wait for the InferenceService to be in a ready state.
 
 ```bash
-kubectl get isvc flower-sample
+kubectl get isvc tf-mnist
 ```
 
 Next, we run the prediction. But first, we need to determine and set the INGRESS_HOST and INGRESS_PORT. Basically, an ingress gateway is like an API gateway that load-balances requests. To test it locally we have to do `Port Forward`.
@@ -616,15 +614,18 @@ export INGRESS_PORT=8080
 We can send a sample request to our inference service. We can curl.
 
 ```bash
-SERVICE_HOSTNAME=$(kubectl get inferenceservice sklearn-iris -n kserve-test -o jsonpath='{.status.url}' | cut -d "/" -f 3)
-curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/flower-sample:predict -d @./mnist-input.json
+SERVICE_HOSTNAME=$(kubectl get inferenceservice tf-mnist -n kubeflow -o jsonpath='{.status.url}' | cut -d "/" -f 3)
+curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict -d @./mnist-input.json
 ```
 
 or we use requests.
 
 ```python
-response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/flower-sample:predict", json=mnist-input.json, headers={"Host": "flower-sample.kubeflow.example.com"})
-print(response.text)
+response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict", json=mnist-input.json, headers={"Host": "tf-mnist.kubeflow.example.com"})
 ```
 
 ## End-to-end Workflow
+
+## References
+
+[1] Distributed ML Patterns
