@@ -1,7 +1,4 @@
 import requests
 
-input_path = "inference-input.json"
-
-response = requests.post(url="http://localhost:8080/v1/models/flower-sample:predict", data=json.dumps(data), headers={'Host': 'flower-sample.kubeflow.example.com'})
-
+response = requests.post(url="http://localhost:8080/v1/models/tf-mnist:predict", json=mnist-input.json, headers={'Host': 'tf-mnist.kubeflow.example.com'})
 print(response.text)
