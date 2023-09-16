@@ -649,11 +649,14 @@ spec:
       storageUri: "pvc://strategy-volume/saved_model_versions"
 ```
 
-Next, I install `Hey`, a tiny program that sends some load to a web application. Install it with `brew install hey`
+Next, I install [Hey](https://github.com/rakyll/hey), a tiny program that sends some load to a web application.
 
 ```bash
-SERVICE_HOSTNAME=$(kubectl get inferenceservice tf-mnist -n kubeflow -o jsonpath='{.status.url}' | cut -d "/" -f 3)
-hey -z 30s -q 50 -m POST -host ${SERVICE_HOSTNAME} -D $INPUT_PATH http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict
+# https://github.com/rakyll/hey
+brew install hey
+kubectl create -f inference-service.yaml
+
+hey -z 30s -q 5 -m POST -host ${SERVICE_HOSTNAME} -D mnist-input.json http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict
 ```
 
 # [TODO]
