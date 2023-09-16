@@ -686,11 +686,17 @@ spec:
         template: model-selection
     - - name: model-serving-step
         template: model-serving
+podGC:
+  strategy: OnPodSuccess
 volumes:
-- name: workdir
+- name: model
   persistentVolumeClaim:
     claimName: strategy-volume
 ```
+
+# [TODO] 
+podGC
+OnPodSuccess
 
 ## References
 
