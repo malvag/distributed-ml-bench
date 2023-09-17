@@ -2,7 +2,6 @@ import tensorflow as tf
 from tensorflow import keras
 import tensorflow_datasets as tfds
 
-
 model = keras.models.load_model("trained_model/saved_model_versions/2")
 
 # Scaling MNIST data from (0, 255] to (0., 1.]
@@ -11,8 +10,7 @@ def scale(image, label):
     image /= 255
     return image, label
 
-
-datasets, _ = tfds.load(name="fashion_mnist", with_info=True, as_supervised=True)
+datasets, info = tfds.load(name="fashion_mnist", with_info=True, as_supervised=True)
 
 ds = datasets["test"].map(scale).cache().shuffle(10000).batch(64)
 
