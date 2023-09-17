@@ -112,6 +112,14 @@ kubens kubeflow
 
 <img width="603" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/54f180ee-bc0a-4e8f-873f-0be8ed5cbbe8">
 
+# [TODO]
+istio
+kubectl cheatsheet
+kind
+kustomize
+kserve
+knative
+
 ## System Architecture
 
 <img width="1143" alt="Screenshot 2023-06-30 at 12 50 13 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/18bb1322-1970-4ef4-a3a6-f7d345623ee0">
