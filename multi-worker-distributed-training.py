@@ -41,7 +41,8 @@ def build_and_compile_cnn_model():
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(64, activation="relu"),
             tf.keras.layers.Dense(10),
-        ]
+        ],
+        name="image_bytes",
     )
 
     model.summary()
@@ -139,6 +140,7 @@ def main(args):
         def serve_image_fn(bytes_inputs):
             decoded_images = tf.map_fn(_preprocess, bytes_inputs, dtype=tf.uint8)
             return model(decoded_images)
+
         return serve_image_fn
 
     # Define the checkpoint directory to store the checkpoints
@@ -179,9 +181,9 @@ def main(args):
     multi_worker_model.save(model_path)
 
     signatures = {
-    "serving_default": _get_serve_image_fn(multi_worker_model).get_concrete_function(
-        tf.TensorSpec(shape=[None], dtype=tf.string)
-        )    
+        "serving_default": _get_serve_image_fn(
+            multi_worker_model
+        ).get_concrete_function(tf.TensorSpec(shape=[None], dtype=tf.string))
     }
 
     tf.saved_model.save(multi_worker_model, model_path, signatures=signatures)

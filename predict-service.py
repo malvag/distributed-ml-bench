@@ -3,7 +3,7 @@ from tensorflow import keras
 import tensorflow_datasets as tfds
 
 
-model = keras.models.load_model("trained_model/saved_model_versions")
+model = keras.models.load_model("trained_model/saved_model_versions/2")
 
 # Scaling MNIST data from (0, 255] to (0., 1.]
 def scale(image, label):

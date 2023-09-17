@@ -636,7 +636,7 @@ inference-request.py
 
 ## Replicated model servers inference
 
-Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests. 
+Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests.
 
 # [TODO]
 kserve autoscale
@@ -676,7 +676,7 @@ load testing with hey
 why? how?
 
 I'm creating an end-to-end workflow with 4 steps:
-1. Data Ingestion 
+1. Data Ingestion
 2. Distributed Training
 3. Model Selection
 4. Model Serving
@@ -697,7 +697,7 @@ spec:
         template: data-ingestion
     - - name: distributed-training-step      # double dash => run after previous step
         template: distributed-training
-    - - name: model-selection-step           
+    - - name: model-selection-step
         template: model-selection
     - - name: model-serving-step
         template: model-serving
@@ -709,7 +709,7 @@ volumes:
     claimName: strategy-volume
 ```
 
-# [TODO] 
+# [TODO]
 steps
 podGC
 OnPodSuccess
