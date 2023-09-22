@@ -10,6 +10,7 @@ def scale(image, label):
     image /= 255
     return image, label
 
+
 datasets, info = tfds.load(name="fashion_mnist", with_info=True, as_supervised=True)
 
 ds = datasets["test"].map(scale).cache().shuffle(10000).batch(64)
