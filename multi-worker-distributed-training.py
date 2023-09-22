@@ -41,8 +41,7 @@ def build_and_compile_cnn_model():
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(64, activation="relu"),
             tf.keras.layers.Dense(10),
-        ],
-        name="image_bytes",
+        ]
     )
 
     model.summary()
