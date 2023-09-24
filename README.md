@@ -1,12 +1,12 @@
 # Distributed ML Systems
 
-Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. I wanted to build it again on a much simpler dataset to deepen my understanding.
+Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. I wanted to build it again on a simpler dataset to deepen my understanding.
 
 ## Introduction
 
-Why distributed systems? Distributing machine learning systems allows developers to handle huge datasets across multiple clusters, take advantage of automation tools, and benefit from hardware accelerations. This repo includes code and references to implement a scalable and reliable machine learning system.
+Why distributed systems? Distributing machine learning systems allows developers to handle massive datasets across multiple clusters, take advantage of automation tools, and benefit from hardware accelerations. This repo includes code and references to implement a scalable and reliable machine learning system.
 
-I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. My goal is to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. I'm building an image classification end-to-end machine learning system.
+I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. I'm building an image classification end-to-end machine learning system.
 
 ## Setup
 
@@ -24,13 +24,13 @@ pip install tensorflow
 brew install kubectl
 ```
 
-[4] We will use Kubernetes as our core distributed infrastructure. In fact, we will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker. Its great for local Kubernetes development.
+[4] We will use Kubernetes as our core distributed infrastructure. In fact, we will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker. It's great for local Kubernetes development.
 
 To install k3d:
 
 ```bash
 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash
-k3d cluster create dist-ml
+k3d cluster create dist-ml --image rancher/k3s:v1.25.3-k3s1
 kubectl get nodes
 ```
 
@@ -55,7 +55,7 @@ kubectl kustomize manifests | kubectl apply -f -
 
 ## Some Basics
 
-For example if you want to create a kubernetes pod, then create a hello-world.yaml as below.
+For example, if you want to create a kubernetes pod, then create a hello-world.yaml as below.
 
 ```yaml
 apiVersion: v1
