@@ -34,8 +34,7 @@ k3d cluster create dist-ml --image rancher/k3s:v1.25.3-k3s1
 kubectl get nodes
 ```
 
-<img width="794" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/d9345b11-6fce-49f0-8ef6-36a999840d0c">
-
+<img width="1095" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/44247003-92b0-4481-af89-5ac6b376fe10">
 
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
 
@@ -48,6 +47,23 @@ brew install kubectx
 ![Kubeflow UI](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/aa731d8d-93cf-4089-a7a4-4a9b0f47e4eb "https://www.kubeflow.org/docs/started/architecture/")
 
 [7] We will also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end-to-end machine learning workflows. Install Argo workflows.
+
+
+Next, we create a namespace. The namespaces provide a mechanism for isolating groups of resources within a single cluster.
+
+To create a namespace
+
+```bash
+kubectl create namespace kubeflow
+```
+
+Next, switch to kubeflow
+
+```bash
+kubens kubeflow
+```
+
+We install all the dependencies for argo workflows and kubeflow training.
 
 ```bash
 kubectl kustomize manifests | kubectl apply -f -
@@ -95,20 +111,6 @@ kubectl get pod whalesay -o yaml
 ```
 
 You can get the JSON or any other format as well.
-
-Next, we create a namespace. The namespaces provide a mechanism for isolating groups of resources within a single cluster.
-
-To create a namespace
-
-```bash
-kubectl create namespace kubeflow
-```
-
-Next, switch to kubeflow
-
-```bash
-kubens kubeflow
-```
 
 <img width="603" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/54f180ee-bc0a-4e8f-873f-0be8ed5cbbe8">
 
