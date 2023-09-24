@@ -34,7 +34,7 @@ k3d cluster create dist-ml --image rancher/k3s:v1.25.3-k3s1
 kubectl get nodes
 ```
 
-<img width="1095" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/44247003-92b0-4481-af89-5ac6b376fe10">
+# [TODO] screenshot of installation of cluster
 
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
 
@@ -63,7 +63,7 @@ Next, switch to kubeflow
 kubens kubeflow
 ```
 
-We install all the dependencies for argo workflows and kubeflow training.
+Now, We install the dependencies for Argo workflows and Kubeflow training.
 
 ```bash
 kubectl kustomize manifests | kubectl apply -f -
@@ -104,7 +104,7 @@ We can see what is being printed out in the container
 kubectl logs whalesay
 ```
 
-If you want to get the details of a single pod with the raw yaml, then enter the following command
+If you want to get the details of a single pod with the raw YAML, then enter the following command
 
 ```bash
 kubectl get pod whalesay -o yaml
@@ -114,18 +114,9 @@ You can get the JSON or any other format as well.
 
 <img width="603" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/54f180ee-bc0a-4e8f-873f-0be8ed5cbbe8">
 
-# [TODO]
-istio
-kubectl cheatsheet
-kind
-kustomize
-kserve
-knative
-
 ## System Architecture
 
 <img width="1143" alt="Screenshot 2023-06-30 at 12 50 13 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/18bb1322-1970-4ef4-a3a6-f7d345623ee0">
-
 
 ## Data Ingestion
 
@@ -334,9 +325,9 @@ k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml
 
 Now when the pods are completed/failed, all files in the pods are recycled by the Kubernetes garbage collection. So all the model checkpoints are lost and we don't have a model for serving. To avoid this we use PersistentVolume(PV) and PersistentVolumeClaim(PVC).
 
-A **PersistentVolume** (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes but have a lifecycle independent of any individual Pod that uses the PV. This means that PV will persist and live even when the pods are deleted.
+A **_PersistentVolume_** (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes but have a lifecycle independent of any individual Pod that uses the PV. This means that PV will persist and live even when the pods are deleted.
 
-A **PersistentVolumeClaim** (PVC) is a request for storage by a user. It is similar to a Pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory). Claims can request specific size and access modes (e.g., they can be mounted ReadWriteOnce, ReadOnlyMany, or ReadWriteMany).
+A **_PersistentVolumeClaim_** (PVC) is a request for storage by a user. It is similar to a Pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory). Claims can request specific size and access modes (e.g., they can be mounted ReadWriteOnce, ReadOnlyMany, or ReadWriteMany).
 
 We can create a PVC to submit a request for storage that will be used in worker pods to store the trained model. Here we are requesting 1GB storage with ReadWriteOnce mode.
 
@@ -569,11 +560,11 @@ signatures = {
 tf.saved_model.save(multi_worker_model, model_path, signatures=signatures)
 ```
 
-Now we have updated the training script so we should rebuild the image and re-train the model.
+Now we have updated the training script, we should rebuild the image and re-train the model.
 
 Next, we will use KServe for inference service. [KServe](https://www.kubeflow.org/docs/external-add-ons/kserve/kserve/) enables serverless inferencing on Kubernetes and provides performant, high-abstraction interfaces for common machine learning (ML) frameworks like TensorFlow, PyTorch, etc. [Refer](https://kserve.github.io/website/0.11/modelserving/v1beta1/tensorflow/).
 
-We create an [InferenceService](https://kserve.github.io/website/0.11/get_started/first_isvc/#run-your-first-inferenceservice) yaml which specifies the framework tensorflow and storageUri that is pointed to a saved tensorflow model.
+We create an [InferenceService](https://kserve.github.io/website/0.11/get_started/first_isvc/#run-your-first-inferenceservice) yaml, which specifies the framework tensorflow and storageUri that is pointed to a saved tensorflow model.
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
@@ -606,7 +597,7 @@ Wait for the InferenceService to be in a ready state.
 kubectl get isvc tf-mnist
 ```
 
-Next, we run the prediction. But first, we need to determine and set the INGRESS_HOST and INGRESS_PORT. Basically, an ingress gateway is like an API gateway that load-balances requests. To test it locally we have to do `Port Forward`.
+Next, we run the prediction. But first, we need to determine and set the INGRESS_HOST and INGRESS_PORT. An ingress gateway is like an API gateway that load-balances requests. To test it locally we have to do `Port Forward`.
 
 ```bash
 INGRESS_GATEWAY_SERVICE=$(kubectl get svc --namespace istio-system --selector="app=istio-ingressgateway" --output jsonpath='{.items[0].metadata.name}')
@@ -634,7 +625,6 @@ response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mn
 ```
 
 # [TODO]
-inference-request.py
 
 ## Replicated model servers inference
 
