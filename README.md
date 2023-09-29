@@ -402,6 +402,8 @@ kubectl logs multi-worker-training-worker-0
 
 We've implemented the distributed model training component. In production, we might need to train different models and pick the top performer for model serving. Let's create two more models to understand this concept.
 
+One model I'mm trying is the CNN model with batch norm layer.
+
 ```python
 def build_and_compile_cnn_model_with_batch_norm():
   print("Training CNN model with batch normalization")
@@ -428,6 +430,8 @@ def build_and_compile_cnn_model_with_batch_norm():
 
   return model
 ```
+
+The other model I'm trying is the CNN model with dropout.
 
 ```python
 def build_and_compile_cnn_model_with_dropout():
@@ -618,7 +622,7 @@ SERVICE_HOSTNAME=$(kubectl get inferenceservice tf-mnist -n kubeflow -o jsonpath
 curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict -d @./mnist-input.json
 ```
 
-or we use requests.
+or we use the requests library.
 
 ```python
 response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict", json=mnist-input.json, headers={"Host": "tf-mnist.kubeflow.example.com"})
