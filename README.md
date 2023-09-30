@@ -34,7 +34,8 @@ k3d cluster create dist-ml --image rancher/k3s:v1.25.3-k3s1
 kubectl get nodes
 ```
 
-# [TODO] screenshot of installation of cluster
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/fe24ce2c-9d02-4360-8137-a7006d0cbbc1)
+
 
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
 
