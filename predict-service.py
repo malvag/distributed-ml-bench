@@ -15,4 +15,5 @@ datasets, info = tfds.load(name="fashion_mnist", with_info=True, as_supervised=T
 
 ds = datasets["test"].map(scale).cache().shuffle(10000).batch(64)
 
-model.predict(ds)
+test_loss, test_acc = model.evaluate(ds)
+print(f"Test loss: {test_loss} and Test accuracy: {test_acc}")

@@ -64,10 +64,13 @@ Next, switch to kubeflow
 kubens kubeflow
 ```
 
-Now, We install the dependencies for Argo workflows and Kubeflow training.
+I'm getting an error `couldn't get resource list for metrics.k8s.io/v1beta1: the server is currently unable to handle the request`. After looking on I understood that I need to edit the metrics server deployment yaml and add `hostNetwork: true` after `dnsPolicy`. It started working again.
+
+Now, we install the dependencies kubeflow training operator.
 
 ```bash
-kubectl kustomize manifests | kubectl apply -f -
+# https://github.com/kubeflow/training-operator#stable-release
+kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.5.0"
 ```
 
 ## Some Basics
@@ -397,6 +400,12 @@ Let's start the pods and train our distributed model. We can see the logs from t
 
 ```bash
 kubectl logs multi-worker-training-worker-0
+```
+
+We can also edit code and resubmit the job.
+
+```bash
+kubectl delete tfjob --all; docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .; k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster distml; kubectl create -f multi-worker-tfjob.yaml
 ```
 
 ## Model Selection
