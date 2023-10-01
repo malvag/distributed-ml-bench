@@ -34,7 +34,8 @@ k3d cluster create dist-ml --image rancher/k3s:v1.25.3-k3s1
 kubectl get nodes
 ```
 
-![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/fe24ce2c-9d02-4360-8137-a7006d0cbbc1)
+#TODO
+_Creating a cluster_
 
 
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
@@ -64,7 +65,7 @@ Next, switch to kubeflow
 kubens kubeflow
 ```
 
-I'm getting an error `couldn't get resource list for metrics.k8s.io/v1beta1: the server is currently unable to handle the request`. After looking on I understood that I need to edit the metrics server deployment yaml and add `hostNetwork: true` after `dnsPolicy`. It started working again.
+_Note_ I'm getting an error `couldn't get resource list for metrics.k8s.io/v1beta1: the server is currently unable to handle the request`. After looking on I understood that I need to edit the metrics server deployment yaml and add `hostNetwork: true` after `dnsPolicy`. It started working again.
 
 Now, we install the dependencies kubeflow training operator.
 
@@ -119,6 +120,8 @@ You can get the JSON or any other format as well.
 <img width="603" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/54f180ee-bc0a-4e8f-873f-0be8ed5cbbe8">
 
 ## System Architecture
+
+The system includes a Distributed training pipeline and an Inference service that can be autoscaled.
 
 <img width="1143" alt="Screenshot 2023-06-30 at 12 50 13 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/18bb1322-1970-4ef4-a3a6-f7d345623ee0">
 
@@ -638,14 +641,18 @@ or we use the requests library.
 response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict", json=mnist-input.json, headers={"Host": "tf-mnist.kubeflow.example.com"})
 ```
 
-# [TODO]
+#TODO
+show the results
+write an inference client that takes the image produces a prediction
 
 ## Replicated model servers inference
 
 Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests.
 
-# [TODO]
-kserve autoscale
+#TODO
+why autoscale
+how does the kserve autoscale
+specs that need to be defined
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
@@ -673,12 +680,14 @@ kubectl create -f inference-service.yaml
 hey -z 30s -q 5 -m POST -host ${SERVICE_HOSTNAME} -D mnist-input.json http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict
 ```
 
-# [TODO]
-load testing with hey
+#TODO
+Load testing with hey
+why we want to do this
+how does the library hey work
 
 ## End-to-end Workflow
 
-# [TODO]
+#TODO
 why? how?
 
 I'm creating an end-to-end workflow with 4 steps:
@@ -715,7 +724,7 @@ volumes:
     claimName: strategy-volume
 ```
 
-# [TODO]
+#TODO
 steps
 podGC
 OnPodSuccess
@@ -732,6 +741,8 @@ OnPodSuccess
 
 [5] [Autoscale InferenceService with inference workload](https://kserve.github.io/website/0.8/modelserving/autoscaling/autoscaling)
 
-[6] [Hey](https://github.com/rakyll/hey)
+[6] [Kubectl cheatsheet](https://www.bluematador.com/learn/kubectl-cheatsheet)
 
-[7] [Argo Workflows](https://argoproj.github.io/argo-workflows/)
+[7] [Hey](https://github.com/rakyll/hey)
+
+[8] [Argo Workflows](https://argoproj.github.io/argo-workflows/)
