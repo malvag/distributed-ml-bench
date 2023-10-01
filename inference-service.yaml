@@ -1,7 +1,7 @@
 apiVersion: "serving.kserve.io/v1beta1"
 kind: "InferenceService"
 metadata:
-  name: "tf-mnist"
+  name: tf-mnist
 spec:
   predictor:
     model:
