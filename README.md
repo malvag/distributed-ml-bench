@@ -332,9 +332,9 @@ k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml
 
 Now when the pods are completed/failed, all files in the pods are recycled by the Kubernetes garbage collection. So all the model checkpoints are lost and we don't have a model for serving. To avoid this we use PersistentVolume(PV) and PersistentVolumeClaim(PVC).
 
-A **_PersistentVolume_** (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes but have a lifecycle independent of any individual Pod that uses the PV. This means that PV will persist and live even when the pods are deleted.
+A **_PersistentVolume (PV)_** is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes but have a lifecycle independent of any individual Pod that uses the PV. This means that PV will persist and live even when the pods are deleted.
 
-A **_PersistentVolumeClaim_** (PVC) is a request for storage by a user. It is similar to a Pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory). Claims can request specific size and access modes (e.g., they can be mounted ReadWriteOnce, ReadOnlyMany, or ReadWriteMany).
+A **_PersistentVolumeClaim (PVC)_** is a request for storage by a user. It is similar to a Pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory). Claims can request specific size and access modes (e.g., they can be mounted ReadWriteOnce, ReadOnlyMany, or ReadWriteMany).
 
 We can create a PVC to submit a request for storage that will be used in worker pods to store the trained model. Here we are requesting 1GB storage with ReadWriteOnce mode.
 
@@ -342,10 +342,9 @@ We can create a PVC to submit a request for storage that will be used in worker 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: volume
+  name: strategy-volume
 spec:
-  accessModes:
-    - ReadWriteOnce
+  accessModes: [ "ReadWriteOnce" ]
   volumeMode: Filesystem
   resources:
     requests:
@@ -388,7 +387,7 @@ spec:
           volumes:
             - name: training
               persistentVolumeClaim:
-                claimName: volume
+                claimName: strategy-volume
 ```
 
 We pass the arguments (`saved_model_dir`, `checkpoint_dir`) to the container. The `volumes` field specifies the persistent volume claim and `volumeMounts` field specifies what folder to mount the files. The `CleanPodPolicy` in the TFJob spec controls the deletion of pods when a job terminates. The `restartPolicy` determines whether pods will be restarted when they exit.
@@ -415,7 +414,7 @@ kubectl delete tfjob --all; docker build -f Dockerfile -t kubeflow/multi-worker-
 
 We've implemented the distributed model training component. In production, we might need to train different models and pick the top performer for model serving. Let's create two more models to understand this concept.
 
-One model I'mm trying is the CNN model with batch norm layer.
+One model I'm trying is the CNN model with a batch norm layer.
 
 ```python
 def build_and_compile_cnn_model_with_batch_norm():
@@ -444,7 +443,7 @@ def build_and_compile_cnn_model_with_batch_norm():
   return model
 ```
 
-The other model I'm trying is the CNN model with dropout.
+The other model I'm trying is the CNN model with a dropout.
 
 ```python
 def build_and_compile_cnn_model_with_dropout():
@@ -643,7 +642,7 @@ response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mn
 
 #TODO
 show the results
-write an inference client that takes the image produces a prediction
+write an inference client that takes the image and produces a prediction
 
 ## Replicated model servers inference
 
@@ -682,8 +681,8 @@ hey -z 30s -q 5 -m POST -host ${SERVICE_HOSTNAME} -D mnist-input.json http://${I
 
 #TODO
 Load testing with hey
-why we want to do this
-how does the library hey work
+why do we want to do this
+how does the library Hey work
 
 ## End-to-end Workflow
 
