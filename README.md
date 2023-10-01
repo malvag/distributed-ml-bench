@@ -1,33 +1,37 @@
 # Distributed ML Systems
 
-Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. I wanted to build it again on a simpler dataset to deepen my understanding.
+Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. I wanted to build it again on a simple dataset to deepen my understanding.
 
 ## Introduction
 
-Why distributed systems? Distributing machine learning systems allows developers to handle massive datasets across multiple clusters, take advantage of automation tools, and benefit from hardware accelerations. This repo includes code and references to implement a scalable and reliable machine learning system.
+Why use distributed machine learning systems? They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations. This repository includes code and references to implement a scalable and reliable machine learning system.
 
-I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. I'm building an image classification end-to-end machine learning system.
+I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. 
+
+I'm building an image classification end-to-end machine learning system.
 
 The steps involved are:
 1. Setup
 2. Data ingestion
 3. Distributed training
 4. Prediction/evaluation
-5. Model serving
+5. Serving
 6. End-to-end workflow
 
 ## Setup
 
 I'm using a Mac and Homebrew to install the tools. We will install Tensorflow, Docker, Kubectl, and k3d, a lightweight wrapper for k3s, which is lightweight Kubernetes.
 
-[1] We will be using [TensorFlow](https://www.tensorflow.org) for data processing, model building and evaluation
+[1] We will be using [TensorFlow](https://www.tensorflow.org) for data processing, model building and evaluation.
+
 ```bash
 pip install tensorflow
 ```
 
-[2] [Docker](https://docker-curriculum.com/#setting-up-your-computer) to create single- or multi-node [k3s](https://k3s.io) clusters
+[2] [Docker](https://docker-curriculum.com/#setting-up-your-computer) to create single- or multi-node [k3s](https://k3s.io) clusters.
 
-[3] kubectl is a CLI for Kubernetes
+[3] Kubectl is a CLI tool for Kubernetes
+
 ```bash
 brew install kubectl
 ```
@@ -58,15 +62,15 @@ brew install kubectx
 [7] We will also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end-to-end machine learning workflows. Install Argo workflows.
 
 
-Next, we create a namespace. The namespaces provide a mechanism for isolating groups of resources within a single cluster.
+We start with creating a namespace. The namespaces provide a mechanism for isolating groups of resources within a single cluster.
 
-To create a namespace
+To create a namespace and name it _kubeflow_.
 
 ```bash
 kubectl create namespace kubeflow
 ```
 
-Next, switch to kubeflow
+Next, switch the current context (default) to kubeflow
 
 ```bash
 kubens kubeflow
@@ -77,7 +81,7 @@ kubens kubeflow
 
 <img width="650" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/1ca6f797-42c8-4584-848e-ee6df054cc59">
 
-Now, we install the dependencies Kubeflow training operator.
+Now, we install the dependencies for the Kubeflow training operator. This training operator provides Kubernetes custom resources that make it easy to run distributed or non-distributed TensorFlow jobs on Kubernetes.
 
 ```bash
 # https://github.com/kubeflow/training-operator#stable-release
