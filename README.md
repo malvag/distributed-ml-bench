@@ -743,6 +743,6 @@ OnPodSuccess
 
 [6] [Kubectl cheatsheet](https://www.bluematador.com/learn/kubectl-cheatsheet)
 
-[7] [Hey](https://github.com/rakyll/hey)
+[7] [Load testing with Hey](https://github.com/rakyll/hey)
 
 [8] [Argo Workflows](https://argoproj.github.io/argo-workflows/)
