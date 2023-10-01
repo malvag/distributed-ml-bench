@@ -34,8 +34,7 @@ k3d cluster create dist-ml --image rancher/k3s:v1.25.3-k3s1
 kubectl get nodes
 ```
 
-#TODO
-_Creating a cluster_
+<img width="1399" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/a3cff8d0-a830-48eb-9727-0e224d7ab142">
 
 
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
@@ -65,7 +64,12 @@ Next, switch to kubeflow
 kubens kubeflow
 ```
 
-_Note_ I'm getting an error `couldn't get resource list for metrics.k8s.io/v1beta1: the server is currently unable to handle the request`. After looking on I understood that I need to edit the metrics server deployment yaml and add `hostNetwork: true` after `dnsPolicy`. It started working again.
+> [!NOTE]
+> I'm getting an error `couldn't get resource list for metrics.k8s.io/v1beta1: the server is currently unable to handle the request`. After looking on I understood that I need to edit the metrics server deployment yaml and add `hostNetwork: true` after `dnsPolicy`. It started working again.
+
+
+<img width="650" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/1ca6f797-42c8-4584-848e-ee6df054cc59">
+
 
 Now, we install the dependencies kubeflow training operator.
 
@@ -73,6 +77,8 @@ Now, we install the dependencies kubeflow training operator.
 # https://github.com/kubeflow/training-operator#stable-release
 kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.5.0"
 ```
+
+<img width="900" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/cecde998-75fa-4145-a19a-9080f5d7f8c0">
 
 ## Some Basics
 
@@ -328,7 +334,7 @@ Next, import the above image to the k3d cluster as it cannot access the image re
 k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml
 ```
 
-<img width="861" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/c96adade-741e-4bd6-a958-49007917a844">
+<img width="1430" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/18f6f0d9-95e2-4e51-9bb1-37c90dfd9d29">
 
 Now when the pods are completed/failed, all files in the pods are recycled by the Kubernetes garbage collection. So all the model checkpoints are lost and we don't have a model for serving. To avoid this we use PersistentVolume(PV) and PersistentVolumeClaim(PVC).
 
