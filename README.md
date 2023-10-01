@@ -389,7 +389,7 @@ spec:
             - name: tensorflow
               image: kubeflow/multi-worker-strategy:v0.1
               imagePullPolicy: IfNotPresent
-              command: ["python", "/multi-worker-distributed-training.py", "--saved_model_dir", "/trained_model/saved_model_versions/2/", "--checkpoint_dir", "/trained_model/checkpoint"]
+              command: ["python", "/multi-worker-distributed-training.py", "--saved_model_dir", "/trained_model/saved_model_versions/2/", "--checkpoint_dir", "/trained_model/checkpoint", "--model-type", "cnn"]
               volumeMounts:
                 - mountPath: /trained_model
                   name: training
@@ -430,6 +430,20 @@ I have trained a CNN model and stored it in the `/saved_model_versions/1/` path.
 ```bash
 kubectl delete tfjob --all; docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .; k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml; kubectl create -f multi-worker-tfjob.yaml
 ```
+
+Next, evaluate model's performance
+
+```bash
+kubectl create -f predict-service.yaml
+kubectl exec --stdin --tty predict-service -- bin/bash
+```
+
+We enter into a running container `predict-service`. It has the trained model stored at `trained_model/saved_model_versions/2/`.
+
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/d61d86da-9188-4695-a166-9206e947a869)
+
+Next, execute predict-service.py which takes the trained model and evaluates it on the test dataset.
+
 
 ## Model Selection
 
@@ -492,7 +506,7 @@ def build_and_compile_cnn_model_with_dropout():
 
 We train these models by submitting three different TFJobs with an argument `--model_type`.
 
-I have updated the `--model_type` and the `--saved_model_dir` for training the CNN with a batch norm layer model. To start training another model, delete the tfjob and resubmit it.
+To start training different models, update the `--model_type` and the `--saved_model_dir`, delete the currently running jobs and resubmit them.
 
 ```bash
 kubectl delete tfjob --all
@@ -547,6 +561,9 @@ spec:
     persistentVolumeClaim:
       claimName: strategy-volume
 ```
+
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/4243d6c8-ce59-44c9-ad78-992f88aa7f5a)
+
 
 ## Model Serving
 
