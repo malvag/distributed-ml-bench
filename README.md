@@ -8,9 +8,16 @@ Why distributed systems? Distributing machine learning systems allows developers
 
 I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. I'm building an image classification end-to-end machine learning system.
 
+The steps involved are:
+1. Setup
+2. Data ingestion
+3. Distributed training
+4. Prediction and evaluation
+5. Model Serving
+
 ## Setup
 
-I'm using a Mac and Homebrew to install the tools. We will install Tensorflow, Docker, kubectl, and k3d, a lightweight wrapper for k3s, which is lightweight Kubernetes.
+I'm using a Mac and Homebrew to install the tools. We will install Tensorflow, Docker, Kubectl, and k3d, a lightweight wrapper for k3s, which is lightweight Kubernetes.
 
 [1] We will be using [TensorFlow](https://www.tensorflow.org) for data processing, model building and evaluation
 ```bash
@@ -67,11 +74,9 @@ kubens kubeflow
 > [!NOTE]
 > I'm getting an error `couldn't get resource list for metrics.k8s.io/v1beta1: the server is currently unable to handle the request`. After looking on I understood that I need to edit the metrics server deployment yaml and add `hostNetwork: true` after `dnsPolicy`. It started working again.
 
-
 <img width="650" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/1ca6f797-42c8-4584-848e-ee6df054cc59">
 
-
-Now, we install the dependencies kubeflow training operator.
+Now, we install the dependencies Kubeflow training operator.
 
 ```bash
 # https://github.com/kubeflow/training-operator#stable-release
@@ -80,9 +85,9 @@ kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/stand
 
 <img width="900" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/cecde998-75fa-4145-a19a-9080f5d7f8c0">
 
-## Some Basics
+## Some basics about Kubernetes and Kubectl commands
 
-For example, if you want to create a kubernetes pod, then create a hello-world.yaml as below.
+For example, if you want to create a Kubernetes pod, then create a hello-world.yaml as below.
 
 ```yaml
 apiVersion: v1
@@ -336,6 +341,7 @@ k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml
 
 <img width="1430" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/18f6f0d9-95e2-4e51-9bb1-37c90dfd9d29">
 
+
 Now when the pods are completed/failed, all files in the pods are recycled by the Kubernetes garbage collection. So all the model checkpoints are lost and we don't have a model for serving. To avoid this we use PersistentVolume(PV) and PersistentVolumeClaim(PVC).
 
 A **_PersistentVolume (PV)_** is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes but have a lifecycle independent of any individual Pod that uses the PV. This means that PV will persist and live even when the pods are deleted.
@@ -404,16 +410,25 @@ Next, we submit this TFJob to our cluster and start our distributed model traini
 kubectl create -f multi-worker-tfjob.yaml
 ```
 
-Let's start the pods and train our distributed model. We can see the logs from the pods below.
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/aafe0c12-6b1e-4755-b49a-932c3c0214ca)
+
+You can see there are 2 pods running our distributed training.
+1. multi-worker-training-worker-0
+2. multi-worker-training-worker-1
+
+We can see the logs from the pod `multi-worker-training-worker-0`.
 
 ```bash
 kubectl logs multi-worker-training-worker-0
 ```
 
-We can also edit code and resubmit the job.
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/24aabb20-68e9-4259-b892-11692c3f7dbb)
+
+
+I have trained a CNN model and stored it in the `/saved_model_versions/1/` path. If we want, we can edit/update the code and resubmit the job. To do this you need to delete the running job, rebuild the docker image, import it, and resubmit the job.
 
 ```bash
-kubectl delete tfjob --all; docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .; k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster distml; kubectl create -f multi-worker-tfjob.yaml
+kubectl delete tfjob --all; docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .; k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml; kubectl create -f multi-worker-tfjob.yaml
 ```
 
 ## Model Selection
@@ -476,6 +491,13 @@ def build_and_compile_cnn_model_with_dropout():
 ```
 
 We train these models by submitting three different TFJobs with an argument `--model_type`.
+
+I have updated the `--model_type` and the `--saved_model_dir` for training the CNN with a batch norm layer model. To start training another model, delete the tfjob and resubmit it.
+
+```bash
+kubectl delete tfjob --all
+kubectl apply -f multi-worker-tfjob.yaml
+```
 
 Next, we load the testing data and the trained model to evaluate its performance. The model with the highest accuracy score can be moved to a different folder and used for model serving.
 
