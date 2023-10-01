@@ -12,8 +12,9 @@ The steps involved are:
 1. Setup
 2. Data ingestion
 3. Distributed training
-4. Prediction and evaluation
-5. Model Serving
+4. Prediction/evaluation
+5. Model serving
+6. End-to-end workflow
 
 ## Setup
 
