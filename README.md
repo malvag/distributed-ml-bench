@@ -4,7 +4,7 @@ Recently, I was involved in a classification-based ML project where we developed
 
 ## Introduction
 
-Why use distributed machine learning systems? I always wonder how these complex models with millions or rather billions parameters are trained and served. The trick is to use distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations. This repository includes code and references to implement a scalable and reliable machine learning system.
+Why use distributed machine learning systems? I always wonder how these complex models with millions or rather billions of parameters are trained and served. The trick is to use distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations. This repository includes code and references to implement a scalable and reliable machine learning system.
 
 I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. 
 
@@ -36,7 +36,7 @@ pip install tensorflow
 brew install kubectl
 ```
 
-[4] We will use Kubernetes as our core distributed infrastructure. In fact, we will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker. It's great for local Kubernetes development.
+[4] We will use Kubernetes as our core distributed infrastructure. We will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker. It's great for local Kubernetes development.
 
 To install k3d:
 
@@ -203,19 +203,22 @@ Now we have created a data ingestion component for distributed ingestion and hav
 
 ```python
 def build_and_compile_cnn_model():
-  print("Training CNN model")
-  model = tf.keras.Sequential([
-      tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(28, 28, 1)),
-      tf.keras.layers.MaxPooling2D(),
-      tf.keras.layers.Flatten(),
-      tf.keras.layers.Dense(64, activation='relu'),
-      tf.keras.layers.Dense(10)
-    ])
+    print("Training CNN model")
+    model = tf.keras.models.Sequential()
+    model.add(tf.keras.layers.Input(shape=(28, 28, 1), name="image_bytes"))
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation="relu"))
+    model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+    model.add(tf.keras.layers.Flatten())
+    model.add(tf.keras.layers.Dense(64, activation="relu"))
+    model.add(tf.keras.layers.Dense(10, activation="softmax"))
 
-  model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-                metrics=['accuracy'])
-  return model
+    model.summary()
+
+    model.compile(
+        optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
+    )
+
+    return model
 ```
 
 Next, we created a model and instantiated the optimizer. We are using accuracy to evaluate the model and sparse categorical cross entropy as the loss function.
@@ -228,27 +231,27 @@ Now we can train the model. We are also defining callbacks that will be executed
 checkpoint_dir = './training_checkpoints'
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
 ```
-Here we are defining the checkpoint directory to store the checkpoints and  the name of the checkpoint files.
+Here we are defining the checkpoint directory to store the checkpoints and the name of the checkpoint files.
 
 2. `tf.keras.callbacks.TensorBoard` writes a log for TensorBoard, which allows you to visualize the graphs
 3. `tf.keras.callbacks.LearningRateScheduler` schedules the learning rate to change after, for example, every epoch/batch
 
 ```python
 def decay(epoch):
-  if epoch < 3:
-    return 1e-3
-  elif epoch >= 3 and epoch < 7:
-    return 1e-4
-  else:
-    return 1e-5
+    if epoch < 3:
+        return 1e-3
+    elif epoch >= 3 and epoch < 7:
+        return 1e-4
+    else:
+        return 1e-5
 ```
 
 4. PrintLR prints the learning rate at the end of each epoch
 
 ```python
 class PrintLR(tf.keras.callbacks.Callback):
-  def on_epoch_end(self, epoch, logs=None):
-    print('\nLearning rate for epoch {} is {}'.format(        epoch + 1, model.optimizer.lr.numpy()))
+    def on_epoch_end(self, epoch, logs=None):
+        print('\nLearning rate for epoch {} is {}'.format(        epoch + 1, model.optimizer.lr.numpy()))
 ```
 
 We put together all the callbacks.
@@ -307,7 +310,7 @@ The `_is_chief` is a utility function that inspects the cluster spec and current
 
 ```python
 def _is_chief():
-  return TASK_INDEX == 0
+    return TASK_INDEX == 0
 
 tf_config = json.loads(os.environ.get('TF_CONFIG') or '{}')
 TASK_INDEX = tf_config['task']['index']
@@ -417,7 +420,7 @@ kubectl create -f multi-worker-tfjob.yaml
 
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/aafe0c12-6b1e-4755-b49a-932c3c0214ca)
 
-You can see there are 2 pods running our distributed training.
+You can see 2 pods running our distributed training.
 1. multi-worker-training-worker-0
 2. multi-worker-training-worker-1
 
@@ -436,7 +439,7 @@ I have trained a CNN model and stored it in the `/saved_model_versions/1/` path.
 kubectl delete tfjob --all; docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .; k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml; kubectl create -f multi-worker-tfjob.yaml
 ```
 
-Next, evaluate model's performance
+Next, evaluate the model's performance
 
 ```bash
 kubectl create -f predict-service.yaml
@@ -458,55 +461,55 @@ One model I'm trying is the CNN model with a batch norm layer.
 
 ```python
 def build_and_compile_cnn_model_with_batch_norm():
-  print("Training CNN model with batch normalization")
-  model = models.Sequential()
-  model.add(layers.Input(shape=(28, 28, 1), name='image_bytes'))
-  model.add(layers.Conv2D(32, (3, 3), activation='relu'))
-  model.add(layers.BatchNormalization())
-  model.add(layers.Activation('sigmoid'))
-  model.add(layers.MaxPooling2D((2, 2)))
-  model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-  model.add(layers.BatchNormalization())
-  model.add(layers.Activation('sigmoid'))
-  model.add(layers.MaxPooling2D((2, 2)))
-  model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-  model.add(layers.Flatten())
-  model.add(layers.Dense(64, activation='relu'))
-  model.add(layers.Dense(10, activation='softmax'))
-
-  model.summary()
-
-  model.compile(optimizer='adam',
-                loss='sparse_categorical_crossentropy',
-                metrics=['accuracy'])
-
-  return model
+    print("Training CNN model with batch normalization")
+    model = models.Sequential()
+    model.add(layers.Input(shape=(28, 28, 1), name='image_bytes'))
+    model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Activation('sigmoid'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Activation('sigmoid'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(10, activation='softmax'))
+  
+    model.summary()
+  
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+  
+    return model
 ```
 
 The other model I'm trying is the CNN model with a dropout.
 
 ```python
 def build_and_compile_cnn_model_with_dropout():
-  print("Training CNN model with dropout")
-  model = models.Sequential()
-  model.add(layers.Input(shape=(28, 28, 1), name='image_bytes'))
-  model.add(layers.Conv2D(32, (3, 3), activation='relu'))
-  model.add(layers.MaxPooling2D((2, 2)))
-  model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-  model.add(layers.MaxPooling2D((2, 2)))
-  model.add(layers.Dropout(0.5))
-  model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-  model.add(layers.Flatten())
-  model.add(layers.Dense(64, activation='relu'))
-  model.add(layers.Dense(10, activation='softmax'))
-
-  model.summary()
-
-  model.compile(optimizer='adam',
-                loss='sparse_categorical_crossentropy',
-                metrics=['accuracy'])
-
-  return model
+    print("Training CNN model with dropout")
+    model = models.Sequential()
+    model.add(layers.Input(shape=(28, 28, 1), name='image_bytes'))
+    model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Dropout(0.5))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(10, activation='softmax'))
+  
+    model.summary()
+  
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+  
+    return model
 ```
 
 We train these models by submitting three different TFJobs with an argument `--model_type`.
@@ -522,25 +525,25 @@ Next, we load the testing data and the trained model to evaluate its performance
 
 ```python
 def scale(image, label):
-  image = tf.cast(image, tf.float32)
-  image /= 255
-  return image, label
+    image = tf.cast(image, tf.float32)
+    image /= 255
+    return image, label
 
 best_model_path = ""
 best_accuracy = 0
 
 for i in range(3):
-  model_path = "trained_models/saved_model_versions/" + str(i)
-  model = tf.keras.models.load_model(model_path)
-
-  datasets, info = tfds.load(name='mnist', with_info=True, as_supervised=True)
-  mnist_test = datasets['test']
-  ds = mnist_test.map(scale).cache().shuffle(BUFFER_SIZE).batch(64)
-  loss, accuracy = model.evaluate(ds)
-
-  if accuracy > best_accuracy:
-    best_accuracy = accuracy
-    best_model_path = model_path
+    model_path = "trained_models/saved_model_versions/" + str(i)
+    model = tf.keras.models.load_model(model_path)
+  
+    datasets, info = tfds.load(name='mnist', with_info=True, as_supervised=True)
+    mnist_test = datasets['test']
+    ds = mnist_test.map(scale).cache().shuffle(BUFFER_SIZE).batch(64)
+    loss, accuracy = model.evaluate(ds)
+  
+    if accuracy > best_accuracy:
+      best_accuracy = accuracy
+      best_model_path = model_path
 
 dst = "trained_model/saved_model_versions/3"
 shutil.copytree(best_model_path, dst)
@@ -598,7 +601,7 @@ nohup tensorflow_model_server \
   --model_base_path=$MODEL_PATH
 ```
 
-_Nohup, short for no hang up is a command in Linux systems that keeps processes running even after exiting the shell or terminal._
+_Nohup, short for no hang-up is a command in Linux systems that keeps processes running even after exiting the shell or terminal._
 
 The method mentioned above works great if we're only experimenting locally. There are more efficient ways for distributed model serving.
 
@@ -690,18 +693,18 @@ or we use the requests library.
 response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict", json=mnist-input.json, headers={"Host": "tf-mnist.kubeflow.example.com"})
 ```
 
-#TODO
-show the results
-write an inference client that takes the image and produces a prediction
+# TODO
+1. show the results
+2. write an inference client that takes the image and produces a prediction
 
 ## Replicated model servers inference
 
 Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests.
 
-#TODO
-why autoscale
-how does the kserve autoscale
-specs that need to be defined
+# TODO
+1. why autoscale
+2. how does the kserve autoscale
+3. specs that need to be defined
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
@@ -729,14 +732,14 @@ kubectl create -f inference-service.yaml
 hey -z 30s -q 5 -m POST -host ${SERVICE_HOSTNAME} -D mnist-input.json http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict
 ```
 
-#TODO
-Load testing with hey
-why do we want to do this
-how does the library Hey work
+# TODO
+1. Load testing with hey
+2. why do we want to do this
+3. how does the library Hey work
 
 ## End-to-end Workflow
 
-#TODO
+# TODO
 why? how?
 
 I'm creating an end-to-end workflow with 4 steps:
@@ -773,10 +776,17 @@ volumes:
     claimName: strategy-volume
 ```
 
-#TODO
-steps
-podGC
-OnPodSuccess
+# TODO
+1. steps
+2. podGC
+3. OnPodSuccess
+
+## Summary
+
+# TODO
+1. Purpose of distributed ML systems
+2. Tools to automate ML tasks
+3. Basic commands that are used
 
 ## References
 
