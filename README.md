@@ -8,9 +8,9 @@ Recently, I was involved in a classification-based ML project where we developed
 Distributed systems are a group of nodes that talk to each other to achieve a specific task. Such as streaming movies across devices, search engines, etc.
 
 ### Why use distributed machine learning systems?
-I always wonder how these complex models with millions or rather billions of parameters are trained and served. The trick is to use the distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations. This repository includes code and references to implement a scalable and reliable machine learning system.
+I always wonder how these complex models with millions or rather billions of parameters are trained and served. The trick is to use the distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations. 
 
-I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. 
+This repository includes code and references to implement a scalable and reliable machine learning system. I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. 
 
 I'm building an image classification end-to-end machine learning system.
 
