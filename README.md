@@ -630,7 +630,7 @@ Now we have updated the training script, we should rebuild the image and re-trai
 
 Next, we will use KServe for inference service. [KServe](https://www.kubeflow.org/docs/external-add-ons/kserve/kserve/) enables serverless inferencing on Kubernetes and provides performant, high-abstraction interfaces for common machine learning (ML) frameworks like TensorFlow, PyTorch, etc. [Refer](https://kserve.github.io/website/0.11/modelserving/v1beta1/tensorflow/).
 
-We create an [InferenceService](https://kserve.github.io/website/0.11/get_started/first_isvc/#run-your-first-inferenceservice) yaml, which specifies the framework tensorflow and storageUri that is pointed to a saved tensorflow model.
+We create an [InferenceService](https://kserve.github.io/website/0.11/get_started/first_isvc/#run-your-first-inferenceservice) yaml, which specifies the framework tensorflow and storageUri that is pointed to a saved Tensorflow model.
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
@@ -645,7 +645,7 @@ spec:
       storageUri: "pvc://strategy-volume/saved_model_versions"
 ```
 
-Install KServe
+Install KServe.
 
 ```bash
 curl -s "https://raw.githubusercontent.com/kserve/kserve/release-0.11/hack/quick_install.sh" | bash
@@ -670,7 +670,7 @@ INGRESS_GATEWAY_SERVICE=$(kubectl get svc --namespace istio-system --selector="a
 kubectl port-forward --namespace istio-system svc/${INGRESS_GATEWAY_SERVICE} 8080:80
 ```
 
-Then do the following
+Then do the following in a different terminal window.
 
 ```bash
 export INGRESS_HOST=localhost
