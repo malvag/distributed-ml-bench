@@ -46,8 +46,7 @@ k3d cluster create dist-ml --image rancher/k3s:v1.25.3-k3s1
 kubectl get nodes
 ```
 
-<img width="1399" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/a3cff8d0-a830-48eb-9727-0e224d7ab142">
-
+<img width="1100" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/a3cff8d0-a830-48eb-9727-0e224d7ab142">
 
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
 
@@ -57,9 +56,14 @@ brew install kubectx
 
 [6] We will use [Kubeflow](https://www.kubeflow.org) to submit jobs to the Kubernetes cluster. Install Kubeflow training operator to run distributed TensorFlow jobs on Kubernetes.
 
+
 ![Kubeflow UI](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/aa731d8d-93cf-4089-a7a4-4a9b0f47e4eb "https://www.kubeflow.org/docs/started/architecture/")
 
+
 [7] We will also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end-to-end machine learning workflows. Install Argo workflows.
+
+
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/24c1ef72-2d1d-4f95-9882-0a9dca981037)
 
 
 We start with creating a namespace. The namespaces provide a mechanism for isolating groups of resources within a single cluster.
@@ -79,7 +83,9 @@ kubens kubeflow
 > [!NOTE]
 > I'm getting an error `couldn't get resource list for metrics.k8s.io/v1beta1: the server is currently unable to handle the request`. After looking on I understood that I need to edit the metrics server deployment yaml and add `hostNetwork: true` after `dnsPolicy`. It started working again.
 
+
 <img width="650" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/1ca6f797-42c8-4584-848e-ee6df054cc59">
+
 
 Now, we install the dependencies for the Kubeflow training operator. This training operator provides Kubernetes custom resources that make it easy to run distributed or non-distributed TensorFlow jobs on Kubernetes.
 
@@ -90,9 +96,10 @@ kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/stand
 
 <img width="900" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/cecde998-75fa-4145-a19a-9080f5d7f8c0">
 
+
 ## Some basics about Kubernetes and Kubectl commands
 
-For example, if you want to create a Kubernetes pod, then create a hello-world.yaml as below.
+For example, if you want to create a Kubernetes pod, create a hello-world.yaml as below.
 
 ```yaml
 apiVersion: v1
@@ -104,7 +111,7 @@ spec:
   - name: whalesay
     image: docker/whalesay:latest
     command: [cowsay]
-    args: ["hello world"]
+    args: ["Hello world"]
 ```
 
 Next, submit the job to our cluster
@@ -133,19 +140,25 @@ kubectl get pod whalesay -o yaml
 
 You can get the JSON or any other format as well.
 
+
 <img width="603" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/54f180ee-bc0a-4e8f-873f-0be8ed5cbbe8">
+
 
 ## System Architecture
 
 The system includes a Distributed training pipeline and an Inference service that can be autoscaled.
 
+
 <img width="1143" alt="Screenshot 2023-06-30 at 12 50 13 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/18bb1322-1970-4ef4-a3a6-f7d345623ee0">
+
 
 ## Data Ingestion
 
 We will use the Fashion MNIST dataset which contains 70,000 grayscale images in 10 categories. The images show individual articles of clothing at low resolution (28 by 28 pixels), as seen here:
 
+
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/9356978d-f3ab-4404-b35b-d5e50b3c82cb)
+
 
 Here, 60,000 images are used to train the network and 10,000 images are used to evaluate how accurately the network learned to classify images.
 
@@ -341,6 +354,7 @@ docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .
 
 <img width="865" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/f4a6fbdb-0704-4f61-963d-b876874a2183">
 
+
 Next, import the above image to the k3d cluster as it cannot access the image registry.
 
 ```bash
@@ -418,7 +432,9 @@ Next, we submit this TFJob to our cluster and start our distributed model traini
 kubectl create -f multi-worker-tfjob.yaml
 ```
 
+
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/aafe0c12-6b1e-4755-b49a-932c3c0214ca)
+
 
 You can see 2 pods running our distributed training.
 1. multi-worker-training-worker-0
@@ -429,6 +445,7 @@ We can see the logs from the pod `multi-worker-training-worker-0`.
 ```bash
 kubectl logs multi-worker-training-worker-0
 ```
+
 
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/24aabb20-68e9-4259-b892-11692c3f7dbb)
 
@@ -448,7 +465,9 @@ kubectl exec --stdin --tty predict-service -- bin/bash
 
 We enter into a running container `predict-service`. It has the trained model stored at `trained_model/saved_model_versions/2/`.
 
+
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/d61d86da-9188-4695-a166-9206e947a869)
+
 
 Next, execute predict-service.py which takes the trained model and evaluates it on the test dataset.
 
@@ -569,6 +588,7 @@ spec:
     persistentVolumeClaim:
       claimName: strategy-volume
 ```
+
 
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/4243d6c8-ce59-44c9-ad78-992f88aa7f5a)
 
