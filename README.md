@@ -4,7 +4,11 @@ Recently, I was involved in a classification-based ML project where we developed
 
 ## Introduction
 
-Why use distributed machine learning systems? I always wonder how these complex models with millions or rather billions of parameters are trained and served. The trick is to use distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations. This repository includes code and references to implement a scalable and reliable machine learning system.
+### What are distributed systems?
+Distributed systems are a group of nodes that talk to each other to achieve a specific task. Such as streaming movies across devices, search engines, etc.
+
+### Why use distributed machine learning systems?
+I always wonder how these complex models with millions or rather billions of parameters are trained and served. The trick is to use the distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations. This repository includes code and references to implement a scalable and reliable machine learning system.
 
 I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. 
 
@@ -212,6 +216,8 @@ model.fit(dataset, epochs=3, steps_per_epoch=70)
 
 ## Model Training
 
+### Single node Model Training
+
 Now we have created a data ingestion component for distributed ingestion and have enabled the sharding as well.
 
 ```python
@@ -300,7 +306,7 @@ We are using the MultiWorkerMirroredStrategy which implements synchronous distri
 
 Once we define our distributed training strategy, we initiate our distributed input data pipeline and the model inside the strategy scope.
 
-### Model saving and loading
+## Model saving and loading
 
 To save the model using `model.save`, the saving destinations need to be different for each worker.
 
@@ -336,7 +342,7 @@ else:
 multi_worker_model.save(model_path)
 ```
 
-### Containerization
+## Containerization
 
 We put everything we wrote till now into a Python script called `multi-worker-distributed-training.py`. Now we can dockerize it to train the model in the Kubernetes cluster.
 
@@ -622,6 +628,8 @@ nohup tensorflow_model_server \
 ```
 
 _Nohup, short for no hang-up is a command in Linux systems that keeps processes running even after exiting the shell or terminal._
+
+### Distributed model inference
 
 The method mentioned above works great if we're only experimenting locally. There are more efficient ways for distributed model serving.
 
