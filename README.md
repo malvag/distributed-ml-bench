@@ -826,12 +826,16 @@ volumes:
 
 [3] [Distributed training with Keras](https://www.tensorflow.org/tutorials/distribute/keras)
 
-[4] [First InferenceService](https://kserve.github.io/website/0.7/get_started/first_isvc/#5-run-performance-test)
+[4] [Custom training loop with Keras and MultiWorkerMirroredStrategy](https://www.tensorflow.org/tutorials/distribute/multi_worker_with_ctl)
 
-[5] [Autoscale InferenceService with inference workload](https://kserve.github.io/website/0.8/modelserving/autoscaling/autoscaling)
+[5] [Distributed training with TensorFlow](https://www.tensorflow.org/guide/distributed_training)
 
-[6] [Kubectl cheatsheet](https://www.bluematador.com/learn/kubectl-cheatsheet)
+[6] [First InferenceService](https://kserve.github.io/website/0.7/get_started/first_isvc/#5-run-performance-test)
 
-[7] [Load testing with Hey](https://github.com/rakyll/hey)
+[7] [Autoscale InferenceService with inference workload](https://kserve.github.io/website/0.8/modelserving/autoscaling/autoscaling)
 
-[8] [Argo Workflows](https://argoproj.github.io/argo-workflows/)
+[8] [Kubectl cheatsheet](https://www.bluematador.com/learn/kubectl-cheatsheet)
+
+[9] [Load testing with Hey](https://github.com/rakyll/hey)
+
+[10] [Argo Workflows](https://argoproj.github.io/argo-workflows/)
