@@ -145,10 +145,6 @@ kubectl get pod whalesay -o yaml
 
 You can get the JSON or any other format as well.
 
-
-<img width="603" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/54f180ee-bc0a-4e8f-873f-0be8ed5cbbe8">
-
-
 ## System Architecture
 
 The system includes a Distributed training pipeline and an Inference service that can be autoscaled.
