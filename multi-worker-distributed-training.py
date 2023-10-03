@@ -132,7 +132,9 @@ def main(args):
         return tf.cast(resized, dtype=tf.uint8)
 
     def _get_serve_image_fn(model):
-        @tf.function(input_signature=[tf.TensorSpec([None], tf.string)])
+        @tf.function(
+            input_signature=[tf.TensorSpec([None], dtype=tf.string, name="image_bytes")]
+        )
         def serve_image_fn(bytes_inputs):
             decoded_images = tf.map_fn(_preprocess, bytes_inputs, dtype=tf.uint8)
             return model(decoded_images)
@@ -179,7 +181,9 @@ def main(args):
     signatures = {
         "serving_default": _get_serve_image_fn(
             multi_worker_model
-        ).get_concrete_function(tf.TensorSpec(shape=[None], dtype=tf.string))
+        ).get_concrete_function(
+            tf.TensorSpec(shape=[None], dtype=tf.string, name="image_bytes")
+        )
     }
 
     tf.saved_model.save(multi_worker_model, model_path, signatures=signatures)
