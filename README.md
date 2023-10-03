@@ -645,7 +645,7 @@ def _preprocess(bytes_inputs):
     return tf.cast(resized, dtype=tf.uint8)
 
 def _get_serve_image_fn(model):
-    @tf.function(input_signature=[tf.TensorSpec([None], tf.string)])
+    @tf.function(input_signature=[tf.TensorSpec([None], dtype=tf.string, name='image_bytes')])
     def serve_image_fn(bytes_inputs):
         decoded_images = tf.map_fn(_preprocess, bytes_inputs, dtype=tf.uint8)
         return model(decoded_images)
@@ -653,7 +653,7 @@ def _get_serve_image_fn(model):
 
 signatures = {
     "serving_default": _get_serve_image_fn(model).get_concrete_function(
-        tf.TensorSpec(shape=[None], dtype=tf.string)
+        tf.TensorSpec(shape=[None], dtype=tf.string, name='image_bytes')
     )
 }
 
