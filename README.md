@@ -783,8 +783,14 @@ I'm sending traffic for 30 seconds with 5 concurrent requests. As the scaling ta
 
 ## End-to-end Workflow
 
-# TODO
-why? how?
+It's time to connect all the parts. I'm using argo workflow to orchestrate the jobs we executed before in an end-to-end fashion. We can build a CICD workflow using DAG (exactly similar to GitLab CICD) on Kubernetes. Argo is the defacto engine for orchestration on Kubernetes.
+
+We will start by installing argo workflows in a different namespace.
+
+```bash
+kubectl create namespace argo
+kubectl apply -n argo -f https://github.com/argoproj/argo-workflows/releases/download/v3.4.11/install.yaml
+```
 
 I'm creating an end-to-end workflow with 4 steps:
 1. Data Ingestion
