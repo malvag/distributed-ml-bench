@@ -2,6 +2,8 @@ apiVersion: "serving.kserve.io/v1beta1"
 kind: InferenceService
 metadata:
   name: tf-mnist
+  annotations:
+    autoscaling.knative.dev/target: "1"
 spec:
   predictor:
     model:

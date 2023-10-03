@@ -8,9 +8,9 @@ Recently, I was involved in a classification-based ML project where we developed
 Distributed systems are a group of nodes that talk to each other to achieve a specific task. Such as streaming movies across devices, search engines, etc.
 
 ### Why use distributed machine learning systems?
-I always wonder how these complex models with millions or rather billions of parameters are trained and served. The trick is to use the distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations. 
+I always wonder how these complex models with millions or rather billions of parameters are trained and served. The trick is to use the distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations.
 
-This repository includes code and references to implement a scalable and reliable machine learning system. I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads. 
+This repository includes code and references to implement a scalable and reliable machine learning system. I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads.
 
 I'm building an image classification end-to-end machine learning system.
 
@@ -504,13 +504,13 @@ def build_and_compile_cnn_model_with_batch_norm():
     model.add(layers.Flatten())
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(10, activation='softmax'))
-  
+
     model.summary()
-  
+
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
-  
+
     return model
 ```
 
@@ -530,13 +530,13 @@ def build_and_compile_cnn_model_with_dropout():
     model.add(layers.Flatten())
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(10, activation='softmax'))
-  
+
     model.summary()
-  
+
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
-  
+
     return model
 ```
 
@@ -563,12 +563,12 @@ best_accuracy = 0
 for i in range(3):
     model_path = "trained_models/saved_model_versions/" + str(i)
     model = tf.keras.models.load_model(model_path)
-  
+
     datasets, info = tfds.load(name='mnist', with_info=True, as_supervised=True)
     mnist_test = datasets['test']
     ds = mnist_test.map(scale).cache().shuffle(BUFFER_SIZE).batch(64)
     loss, accuracy = model.evaluate(ds)
-  
+
     if accuracy > best_accuracy:
       best_accuracy = accuracy
       best_model_path = model_path
@@ -668,9 +668,9 @@ We create an [InferenceService](https://kserve.github.io/website/0.11/get_starte
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
-kind: "InferenceService"
+kind: InferenceService
 metadata:
-  name: "tf-mnist"
+  name: tf-mnist
 spec:
   predictor:
     model:
@@ -723,52 +723,57 @@ curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1
 or we use the requests library.
 
 ```python
-response = requests.post("http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict", json=mnist-input.json, headers={"Host": "tf-mnist.kubeflow.example.com"})
+input_path = "mnist-input.json"
+
+with open(input_path) as json_file:
+    data = json.load(json_file)
+
+response = requests.post(
+    url="http://localhost:8080/v1/models/tf-mnist:predict",
+    data=json.dumps(data),
+    headers={"Host": "tf-mnist.kubeflow.example.com"},
+)
+print(response.text)
 ```
 
-# TODO
-1. show the results
-2. write an inference client that takes the image and produces a prediction
+
+
+
 
 ## Replicated model servers inference
 
-Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests.
-
-# TODO
-1. why autoscale
-2. how does the kserve autoscale
-3. specs that need to be defined
+Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests. The autoscaler can scale down to zero if the application is receiving no traffic or we can specify a minimum number of replicas that needs to be there. The `autoscaling.knative.dev/target` sets a soft limit. There are other specs that can be configured like `minReplicas`, `containerConcurrency`, and `scaleMetric`, etc.
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
-kind: "InferenceService"
+kind: InferenceService
 metadata:
-  name: "tf-mnist"
+  name: tf-mnist
   annotations:
     autoscaling.knative.dev/target: "1"
 spec:
   predictor:
-    containerConcurrency: 1
     model:
       modelFormat:
         name: tensorflow
       storageUri: "pvc://strategy-volume/saved_model_versions"
 ```
 
-Next, I install [Hey](https://github.com/rakyll/hey), a tiny program that sends some load to a web application.
+Next, I install [Hey](https://github.com/rakyll/hey), a tiny program that sends some load to a web application. Hey runs provided number of requests in the provided concurrency level and prints stats.
 
 ```bash
 # https://github.com/rakyll/hey
 brew install hey
 kubectl create -f inference-service.yaml
 
-hey -z 30s -q 5 -m POST -host ${SERVICE_HOSTNAME} -D mnist-input.json http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict
+hey -z 30s -q 5 -m POST -host ${SERVICE_HOSTNAME} -D mnist-input.json "http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict"
 ```
 
-# TODO
-1. Load testing with hey
-2. why do we want to do this
-3. how does the library Hey work
+
+
+
+I'm sending traffic for 30 seconds with 5 concurrent requests. As the scaling target is set to 1 and we load the service with 5 concurrent requests, so the autoscaler tries scaling up to 5 pods. There will be a cold start time initially to spawn pods. It may take longer (to pull docker image) if is not cached on the node.
+
 
 ## End-to-end Workflow
 
