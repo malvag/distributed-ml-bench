@@ -711,8 +711,10 @@ export INGRESS_PORT=8080
 We can send a sample request to our inference service. We can curl.
 
 ```bash
-SERVICE_HOSTNAME=$(kubectl get inferenceservice tf-mnist -n kubeflow -o jsonpath='{.status.url}' | cut -d "/" -f 3)
-curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict -d @./mnist-input.json
+MODEL_NAME=tf-mnist
+INPUT_PATH=@./mnist-input.json
+SERVICE_HOSTNAME=$(kubectl get inferenceservice $MODEL_NAME -n kubeflow -o jsonpath='{.status.url}' | cut -d "/" -f 3)
+curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/$MODEL_NAME:predict -d $INPUT_PATH
 ```
 
 or we use the requests library.
