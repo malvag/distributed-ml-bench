@@ -737,12 +737,15 @@ print(response.text)
 ```
 
 
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/6aa90d74-33f8-4f37-8b21-687e8c4453b0)
 
+
+Our inference service is working as expected.
 
 
 ## Replicated model servers inference
 
-Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests. The autoscaler can scale down to zero if the application is receiving no traffic or we can specify a minimum number of replicas that needs to be there. The `autoscaling.knative.dev/target` sets a soft limit. There are other specs that can be configured like `minReplicas`, `containerConcurrency`, and `scaleMetric`, etc.
+Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests. The autoscaler can scale down to zero if the application is receiving no traffic or we can specify a minimum number of replicas that need to be there. The `autoscaling.knative.dev/target` sets a soft limit. There are other specs that can be configured like `minReplicas`, `containerConcurrency`, and `scaleMetric`, etc.
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
@@ -759,7 +762,7 @@ spec:
       storageUri: "pvc://strategy-volume/saved_model_versions"
 ```
 
-Next, I install [Hey](https://github.com/rakyll/hey), a tiny program that sends some load to a web application. Hey runs provided number of requests in the provided concurrency level and prints stats.
+Next, I install [Hey](https://github.com/rakyll/hey), a tiny program that sends some load to a web application. Hey runs provided a number of requests in the provided concurrency level and prints stats.
 
 ```bash
 # https://github.com/rakyll/hey
@@ -770,9 +773,11 @@ hey -z 30s -q 5 -m POST -host ${SERVICE_HOSTNAME} -D mnist-input.json "http://${
 ```
 
 
+<img width="1403" alt="Screenshot 2023-10-03 at 4 29 11 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/9d41eaac-4cf6-4649-8198-ca9daa2c3bb8">
 
 
-I'm sending traffic for 30 seconds with 5 concurrent requests. As the scaling target is set to 1 and we load the service with 5 concurrent requests, so the autoscaler tries scaling up to 5 pods. There will be a cold start time initially to spawn pods. It may take longer (to pull docker image) if is not cached on the node.
+
+I'm sending traffic for 30 seconds with 5 concurrent requests. As the scaling target is set to 1 and we load the service with 5 concurrent requests, the autoscaler tries scaling up to 5 pods. There will be a cold start time initially to spawn pods. It may take longer (to pull the docker image) if is not cached on the node.
 
 
 ## End-to-end Workflow
