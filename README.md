@@ -465,6 +465,11 @@ Next, evaluate the model's performance
 
 ```bash
 kubectl create -f predict-service.yaml
+```
+
+Now we have a trained model stored.
+
+```bash
 kubectl exec --stdin --tty predict-service -- bin/bash
 ```
 
@@ -765,7 +770,7 @@ Next, I install [Hey](https://github.com/rakyll/hey), a tiny program that sends 
 brew install hey
 kubectl create -f inference-service.yaml
 
-hey -z 30s -q 5 -m POST -host ${SERVICE_HOSTNAME} -D mnist-input.json "http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict"
+hey -z 30s -c 5 -m POST -host ${SERVICE_HOSTNAME} -D mnist-input.json "http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/tf-mnist:predict"
 ```
 
 
