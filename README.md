@@ -50,7 +50,8 @@ k3d cluster create dist-ml --image rancher/k3s:v1.25.3-k3s1
 kubectl get nodes
 ```
 
-<img width="1100" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/a3cff8d0-a830-48eb-9727-0e224d7ab142">
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/30b17dcb-2632-4812-93cb-31b783c52b11)
+
 
 [5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
 
@@ -88,7 +89,7 @@ kubens kubeflow
 > I'm getting an error `couldn't get resource list for metrics.k8s.io/v1beta1: the server is currently unable to handle the request`. After looking on I understood that I need to edit the metrics server deployment yaml and add `hostNetwork: true` after `dnsPolicy`. It started working again.
 
 
-<img width="650" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/1ca6f797-42c8-4584-848e-ee6df054cc59">
+<img width="668" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/7103ff40-8f0e-42d3-b49e-0a2cd1b776e1">
 
 
 Now, we install the dependencies for the Kubeflow training operator. This training operator provides Kubernetes custom resources that make it easy to run distributed or non-distributed TensorFlow jobs on Kubernetes.
@@ -98,7 +99,7 @@ Now, we install the dependencies for the Kubeflow training operator. This traini
 kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.5.0"
 ```
 
-<img width="900" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/cecde998-75fa-4145-a19a-9080f5d7f8c0">
+<img width="1273" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/022bca6c-c764-48a6-af4e-734a3465775f">
 
 
 ## Some basics about Kubernetes and Kubectl commands
@@ -367,7 +368,9 @@ Next, import the above image to the k3d cluster as it cannot access the image re
 k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml
 ```
 
-<img width="1430" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/18f6f0d9-95e2-4e51-9bb1-37c90dfd9d29">
+
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/9a6d843b-7cfd-451c-8c0a-ef08b8649326)
+
 
 
 Now when the pods are completed/failed, all files in the pods are recycled by the Kubernetes garbage collection. So all the model checkpoints are lost and we don't have a model for serving. To avoid this we use PersistentVolume(PV) and PersistentVolumeClaim(PVC).
@@ -839,3 +842,5 @@ volumes:
 [9] [Load testing with Hey](https://github.com/rakyll/hey)
 
 [10] [Argo Workflows](https://argoproj.github.io/argo-workflows/)
+
+[11] [TensorFlow Distributed Training on Kubeflow](https://dzlab.github.io/ml/2020/07/18/kubeflow-training/)
