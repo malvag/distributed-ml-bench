@@ -746,7 +746,7 @@ Our inference service is working as expected.
 
 ## Replicated model servers inference
 
-Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests. The autoscaler can scale down to zero if the application is receiving no traffic or we can specify a minimum number of replicas that need to be there. The `autoscaling.knative.dev/target` sets a soft limit. There are other specs that can be configured like `minReplicas`, `containerConcurrency`, and `scaleMetric`, etc.
+Next, I want to have multiple model servers to handle large amounts of traffic. KServe can autoscale based on the requests. The autoscaler can scale down to zero if the application is receiving no traffic or we can specify a minimum number of replicas that need to be there. The `autoscaling.knative.dev/target` sets a soft limit. Other specs that can be configured like `minReplicas`, `containerConcurrency`, and `scaleMetric`, etc.
 
 ```yaml
 apiVersion: "serving.kserve.io/v1beta1"
