@@ -829,7 +829,7 @@ This is a multi-step workflow where all the steps are executed sequentially(doub
 
 The first step is the data ingestion. We have added a `memoize` spec to cache the output of this step. Memoization reduces cost and execution time. Since we do not want to download the data every time, we can cache it using the configMap. We have to specify the `key` and name for the `config-map` cache. I have also specified `maxAge` to `1h`, which defines how long should the cache be considered valid.
 
-```bash
+```yaml
 - name: data-ingestion-step
   serviceAccountName: argo
   memoize:
@@ -847,7 +847,7 @@ The first step is the data ingestion. We have added a `memoize` spec to cache th
 Next, we execute the model training steps in parallel.
 
 
-```bash
+```yaml
 - name: distributed-training-steps
   steps:
   - - name: cnn-training-step
@@ -861,7 +861,7 @@ Next, we execute the model training steps in parallel.
 Next, we create a step to run distributed training with the CNN model. To create the TFJob, we include the manifest we created before. We also add the `successCondition` and `failureCondition` to indicate if the job is created. Here we are storing the trained model in a different folder. We create similar steps for the other two models.
 
 
-```bash
+```yaml
 - name: cnn-training-step
   serviceAccountName: training-operator
   resource:
@@ -902,7 +902,7 @@ Next, we create a step to run distributed training with the CNN model. To create
 
 Next, we add the model selection step. It is similar to `model-selection.yaml` we created earlier.
 
-```bash
+```yaml
 - name: model-selection-step
   serviceAccountName: argo
   container:
@@ -916,7 +916,7 @@ Next, we add the model selection step. It is similar to `model-selection.yaml` w
 
 The last step of the workflow is the model serving.
 
-```bash
+```yaml
 - name: model-serving-step
   serviceAccountName: training-operator
   successCondition: status.modelStatus.states.transitionStatus = UpToDate
@@ -947,7 +947,7 @@ kubectl create -f workflow.yaml
 1. A distributed machine learning system is designed to train machine learning models on large datasets that cannot be processed on a single machine. To train complex models with millions or rather billions of parameters, there is a need to distribute the computation or the training process.
 2. Kubernetes is a popular choice for building such complex distributed systems. We can build scalable and highly available systems using K8s.
 3. Tensorflow provides a number of strategies for distributed training. We have used `MultiWorkerMirroredStrategy` here.
-4. We have used KServe for building a Inference Service which can be autoscaled based on the traffic.
+4. We have used KServe for building an Inference Service which can be autoscaled based on the traffic.
 5. Argo workflows are helpful in building CICD pipelines on Kubernetes.
 
 ## References
