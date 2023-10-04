@@ -856,7 +856,7 @@ Next, we execute the model training steps in parallel.
       template: cnn-with-dropout-training-step
 ```
 
-Next, we create a step to run distributed training with the CNN model. To create the TFJob, we include manifest we created before. We also add the `successCondition` and `failureCondition` to indicate if the job is created.
+Next, we create a step to run distributed training with the CNN model. To create the TFJob, we include manifest we created before. We also add the `successCondition` and `failureCondition` to indicate if the job is created. Here we are storing the trained model in a different folder. We create the similar steps for the other two models.
 
 
 ```bash
@@ -898,7 +898,48 @@ Next, we create a step to run distributed training with the CNN model. To create
                     claimName: strategy-volume
 ```
 
+Next, we add the model selection step. It is similar to `model-selection.yaml` we created earlier.
 
+```bash
+- name: model-selection-step
+  serviceAccountName: argo
+  container:
+    image: kubeflow/multi-worker-strategy:v0.1
+    imagePullPolicy: IfNotPresent
+    command: ["python", "/model-selection.py"]
+    volumeMounts:
+    - name: model
+      mountPath: /trained_model
+```
+
+The last step of the workflow is the model serving.
+
+```bash
+- name: model-serving-step
+  serviceAccountName: training-operator
+  successCondition: status.modelStatus.states.transitionStatus = UpToDate
+  resource:
+    action: create
+    setOwnerReference: true
+    manifest: |
+      apiVersion: "serving.kserve.io/v1beta1"
+      kind: InferenceService
+      metadata:
+        name: tf-mnist
+      spec:
+        predictor:
+          model:
+            modelFormat:
+              name: tensorflow
+            image: "emacski/tensorflow-serving:2.6.0"
+            storageUri: "pvc://strategy-volume/saved_model_versions"
+```
+
+Next, run the workfow.
+
+```bash
+kubectl create -f workflow.yaml
+```
 
 ## Summary
 
