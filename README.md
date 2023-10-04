@@ -834,12 +834,68 @@ The first step is the data ingestion.
   serviceAccountName: argo
   memoize:
     cache:
-    key: 
+    key:
     maxAge: "1h"
   container:
     image: kubeflow/multi-worker-strategy:v0.1
     imagePullPolicy: IfNotPresent
     command: ["python", "/data-ingestion.py"]
+```
+
+Next, we execute the model training steps in parallel.
+
+
+```bash
+- name: distributed-training-steps
+  steps:
+  - - name: cnn-training-step
+      template: cnn-training-step
+    - name: cnn-with-batchnorm-training-step
+      template: cnn-with-batchnorm-training-step
+    - name: cnn-with-dropout-training-step
+      template: cnn-with-dropout-training-step
+```
+
+Next, we create a step to run distributed training with the CNN model. To create the TFJob, we include manifest we created before. We also add the `successCondition` and `failureCondition` to indicate if the job is created.
+
+
+```bash
+- name: cnn-training-step
+  serviceAccountName: training-operator
+  resource:
+    action: create
+    setOwnerReference: true
+    successCondition: status.replicaStatuses.Worker.succeeded = 2
+    failureCondition: status.replicaStatuses.Worker.failed > 0
+  manifests: |
+    apiVersion: kubeflow.org/v1
+    kind: TFJob
+    metadata:
+      generateName: multi-worker-training-
+    spec:
+      runPolicy:
+        cleanPodPolicy: None
+      tfReplicaSpecs:
+        Worker:
+          replicas: 2
+          restartPolicy: Never
+          template:
+            spec:
+              containers:
+                - name: tensorflow
+                  image: kubeflow/multi-worker-strategy:v0.1
+                  imagePullPolicy: IfNotPresent
+                  command: ["python", "/multi-worker-distributed-training.py", "--saved_model_dir", "/trained_model/saved_model_versions/1/", "--checkpoint_dir", "/trained_model/checkpoint", "--model_type", "cnn"]
+                  volumeMounts:
+                    - mountPath: /trained_model
+                      name: training
+                  resources:
+                    limits:
+                      cpu: 500m
+              volumes:
+                - name: training
+                  persistentVolumeClaim:
+                    claimName: strategy-volume
 ```
 
 
