@@ -825,10 +825,24 @@ volumes:
     claimName: strategy-volume
 ```
 
-# TODO
-1. steps
-2. podGC
-3. OnPodSuccess
+This is a multi-step workflow where all the steps are executed sequentially(double dash). `PodGC` describes how to delete completed pods. Deleting completed pods can free the resources. I'm also using persistent storage to store the dataset and the trained models.
+
+The first step is the data ingestion.
+
+```bash
+- name: data-ingestion-step
+  serviceAccountName: argo
+  memoize:
+    cache:
+    key: 
+    maxAge: "1h"
+  container:
+    image: kubeflow/multi-worker-strategy:v0.1
+    imagePullPolicy: IfNotPresent
+    command: ["python", "/data-ingestion.py"]
+```
+
+
 
 ## Summary
 
