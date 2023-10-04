@@ -827,14 +827,16 @@ volumes:
 
 This is a multi-step workflow where all the steps are executed sequentially(double dash). `PodGC` describes how to delete completed pods. Deleting completed pods can free the resources. I'm also using persistent storage to store the dataset and the trained models.
 
-The first step is the data ingestion.
+The first step is the data ingestion. We have added a `memoize` spec to cache the output of this step. Memoization reduces cost and execution time. Since we do not want to download the data every time, we can cache it using the configMap. We have to specify the `key` and name for the `config-map` cache. I have also specified `maxAge` to `1h`, which defines how long should the cache be considered valid.
 
 ```bash
 - name: data-ingestion-step
   serviceAccountName: argo
   memoize:
-    cache:
-    key:
+  cache:
+    configMap:
+      name: data-ingestion-config
+      key: "data-ingestion-cache"
     maxAge: "1h"
   container:
     image: kubeflow/multi-worker-strategy:v0.1
@@ -856,7 +858,7 @@ Next, we execute the model training steps in parallel.
       template: cnn-with-dropout-training-step
 ```
 
-Next, we create a step to run distributed training with the CNN model. To create the TFJob, we include manifest we created before. We also add the `successCondition` and `failureCondition` to indicate if the job is created. Here we are storing the trained model in a different folder. We create the similar steps for the other two models.
+Next, we create a step to run distributed training with the CNN model. To create the TFJob, we include the manifest we created before. We also add the `successCondition` and `failureCondition` to indicate if the job is created. Here we are storing the trained model in a different folder. We create similar steps for the other two models.
 
 
 ```bash
@@ -931,11 +933,10 @@ The last step of the workflow is the model serving.
           model:
             modelFormat:
               name: tensorflow
-            image: "emacski/tensorflow-serving:2.6.0"
             storageUri: "pvc://strategy-volume/saved_model_versions"
 ```
 
-Next, run the workfow.
+Next, run the workflow.
 
 ```bash
 kubectl create -f workflow.yaml
