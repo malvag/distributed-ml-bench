@@ -974,3 +974,5 @@ kubectl create -f workflow.yaml
 [10] [Argo Workflows](https://argoproj.github.io/argo-workflows/)
 
 [11] [TensorFlow Distributed Training on Kubeflow](https://dzlab.github.io/ml/2020/07/18/kubeflow-training/)
+
+[12] [MLOps for all](https://mlops-for-all.github.io/en/docs/introduction/intro)
