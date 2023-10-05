@@ -32,9 +32,9 @@ I'm using a Mac and Homebrew to install the tools. We will install Tensorflow, D
 pip install tensorflow
 ```
 
-[2] [Docker](https://docker-curriculum.com/#setting-up-your-computer) to create single- or multi-node [k3s](https://k3s.io) clusters.
+[2] Docker to create single- or multi-node [k3s](https://k3s.io) clusters. Learn about docker [here](https://docker-curriculum.com/#setting-up-your-computer).
 
-[3] Kubectl is a CLI tool for Kubernetes
+[3] Kubectl is a CLI tool for Kubernetes. I installed it using Brew.
 
 ```bash
 brew install kubectl
@@ -42,7 +42,7 @@ brew install kubectl
 
 [4] We will use Kubernetes as our core distributed infrastructure. We will use [k3d](https://k3d.io/v5.5.2/) which is a lightweight wrapper to run k3s (Rancher Lab’s minimal Kubernetes distribution) in docker. It's great for local Kubernetes development.
 
-To install k3d:
+Install k3d and create a cluster using k3d.
 
 ```bash
 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash
@@ -53,19 +53,19 @@ kubectl get nodes
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/30b17dcb-2632-4812-93cb-31b783c52b11)
 
 
-[5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces
+[5] [kubectx](https://github.com/ahmetb/kubectx/) and kubens to easily switch contexts and namespaces.
 
 ```bash
 brew install kubectx
 ```
 
-[6] We will use [Kubeflow](https://www.kubeflow.org) to submit jobs to the Kubernetes cluster. Install Kubeflow training operator to run distributed TensorFlow jobs on Kubernetes.
+[6] We will use Kubeflow to submit jobs to the Kubernetes cluster. Install Kubeflow training operator to run distributed TensorFlow jobs on Kubernetes.
 
 
 ![Kubeflow UI](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/aa731d8d-93cf-4089-a7a4-4a9b0f47e4eb "https://www.kubeflow.org/docs/started/architecture/")
 
 
-[7] We will also use [Argo workflows](https://argoproj.github.io/workflows) to construct and submit end-to-end machine learning workflows. Install Argo workflows.
+[7] We will also use Argo Workflows to construct and submit end-to-end machine learning workflows. Install Argo Workflows.
 
 
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/24c1ef72-2d1d-4f95-9882-0a9dca981037)
@@ -92,7 +92,7 @@ kubens kubeflow
 <img width="668" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/7103ff40-8f0e-42d3-b49e-0a2cd1b776e1">
 
 
-Now, we install the dependencies for the Kubeflow training operator. This training operator provides Kubernetes custom resources that make it easy to run distributed or non-distributed TensorFlow jobs on Kubernetes.
+Now, we install the dependencies for the Kubeflow training operator. This training operator provides Kubernetes custom resources that make running distributed or non-distributed TensorFlow jobs easy on Kubernetes.
 
 ```bash
 # https://github.com/kubeflow/training-operator#stable-release
@@ -102,9 +102,9 @@ kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/stand
 <img width="1273" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/022bca6c-c764-48a6-af4e-734a3465775f">
 
 
-## Some basics about Kubernetes and Kubectl commands
+## Some basics
 
-For example, if you want to create a Kubernetes pod, create a hello-world.yaml as below.
+For example, if you want to create a Kubernetes pod, you can just create a hello-world.yaml as below.
 
 ```yaml
 apiVersion: v1
@@ -119,25 +119,25 @@ spec:
     args: ["Hello world"]
 ```
 
-Next, submit the job to our cluster
+Next, submit the job to our cluster.
 
 ```bash
 kubectl create -f hello-world.yaml
 ```
 
-We can see the statuses
+We can see the statuses.
 
 ```bash
 kubectl get pods
 ```
 
-We can see what is being printed out in the container
+We can see what is being printed out in the container.
 
 ```bash
 kubectl logs whalesay
 ```
 
-If you want to get the details of a single pod with the raw YAML, then enter the following command
+If you want to get the details of a single pod with the raw YAML, then enter the following command.
 
 ```bash
 kubectl get pod whalesay -o yaml
@@ -441,7 +441,7 @@ kubectl create -f multi-worker-tfjob.yaml
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/aafe0c12-6b1e-4755-b49a-932c3c0214ca)
 
 
-You can see 2 pods running our distributed training.
+We can see 2 pods running our distributed training.
 1. multi-worker-training-worker-0
 2. multi-worker-training-worker-1
 
@@ -461,7 +461,7 @@ I have trained a CNN model and stored it in the `/saved_model_versions/1/` path.
 kubectl delete tfjob --all; docker build -f Dockerfile -t kubeflow/multi-worker-strategy:v0.1 .; k3d image import kubeflow/multi-worker-strategy:v0.1 --cluster dist-ml; kubectl create -f multi-worker-tfjob.yaml
 ```
 
-Next, evaluate the model's performance
+Next, evaluate the model's performance.
 
 ```bash
 kubectl create -f predict-service.yaml
