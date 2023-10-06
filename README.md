@@ -980,3 +980,5 @@ kubectl create -f workflow.yaml
 [13] [How to Train Really Large Models on Many GPUs?](https://lilianweng.github.io/posts/2021-09-25-train-large/)
 
 [14] [Getting Started with Argo Workflows](https://velocity.tech/blog/getting-started-with-argo-workflows)
+
+[15] [Kubernetes best practices](https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-how-and-why-to-build-small-container-images)
