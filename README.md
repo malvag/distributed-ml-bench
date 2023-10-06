@@ -976,3 +976,5 @@ kubectl create -f workflow.yaml
 [11] [TensorFlow Distributed Training on Kubeflow](https://dzlab.github.io/ml/2020/07/18/kubeflow-training/)
 
 [12] [MLOps for all](https://mlops-for-all.github.io/en/docs/introduction/intro)
+
+[13] [How to Train Really Large Models on Many GPUs?](https://lilianweng.github.io/posts/2021-09-25-train-large/)
