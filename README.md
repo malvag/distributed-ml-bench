@@ -978,3 +978,5 @@ kubectl create -f workflow.yaml
 [12] [MLOps for all](https://mlops-for-all.github.io/en/docs/introduction/intro)
 
 [13] [How to Train Really Large Models on Many GPUs?](https://lilianweng.github.io/posts/2021-09-25-train-large/)
+
+[14] [Getting Started with Argo Workflows](https://velocity.tech/blog/getting-started-with-argo-workflows)
