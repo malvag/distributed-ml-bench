@@ -2,6 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Workflow                  # new type of k8s spec
 metadata:
   generateName: tfjob-wf-    # name of the workflow spec
+  namespace: argo
 spec:
   entrypoint: tfjob-wf          # invoke the tfjob template
   templates:
