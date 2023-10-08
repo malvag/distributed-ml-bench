@@ -943,6 +943,9 @@ Next, run the workflow.
 kubectl create -f workflow.yaml
 ```
 
+<img width="1440" alt="Screenshot 2023-10-08 at 9 25 11 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/40b64461-d3ae-48c0-be1f-7ccc7596905c">
+
+
 ## Summary
 
 1. A distributed machine learning system is designed to train machine learning models on large datasets that cannot be processed on a single machine. To train complex models with millions or rather billions of parameters, there is a need to distribute the computation or the training process.
