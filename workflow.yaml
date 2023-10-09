@@ -179,6 +179,8 @@ spec:
         kind: InferenceService
         metadata:
           name: flower-sample
+          annotations:
+            autoscaling.knative.dev/target: "1"
         spec:
           predictor:
             model:
