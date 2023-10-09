@@ -71,7 +71,7 @@ brew install kubectx
 ![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/24c1ef72-2d1d-4f95-9882-0a9dca981037)
 
 
-We start with creating a namespace. The namespaces provide a mechanism for isolating groups of resources within a single cluster.
+We start with creating a namespace. The namespaces provide a mechanism for isolating groups of resources within a single cluster. Read about the best practices to create and organize namespaces [here](https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-organizing-with-namespaces).
 
 To create a namespace and name it _kubeflow_.
 
