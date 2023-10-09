@@ -2,13 +2,17 @@
 
 Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. I wanted to build it again on a simple dataset to deepen my understanding.
 
+
+![image](https://github.com/aniket-mish/distributed-ml-system/assets/71699313/6adbb9cf-7e4c-41bf-a20b-fd865120dbf4)
+
+
 ## Introduction
 
 ### What are distributed systems?
-Distributed systems are a group of nodes that talk to each other to achieve a specific task. Such as streaming movies across devices, search engines, etc.
+Distributed systems are a group of nodes that talk to each other to achieve a specific task, such as streaming movies across devices, search engines, etc.
 
 ### Why use distributed machine learning systems?
-I always wonder how these complex models with millions or rather billions of parameters are trained and served. The trick is to use the distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations.
+I wonder how these complex models with millions or billions of parameters are trained and served. The trick is to use distributed systems. They allow developers to handle massive datasets across multiple clusters, use automation tools, and benefit from hardware accelerations.
 
 This repository includes code and references to implement a scalable and reliable machine learning system. I'm automating machine learning tasks with Kubernetes, Argo Workflows, Kubeflow, and TensorFlow. I aim to construct machine learning pipelines with data ingestion, distributed training, model serving, managing, and monitoring these workloads.
 
@@ -165,7 +169,7 @@ Here, 60,000 images are used to train the network and 10,000 images are used to 
 
 ### Single-node Data Pipeline
 
-The `tf.data` API enables you to build complex input pipelines from simple, reusable pieces. It's very efficient. It makes it possible to handle large amounts of data, read from different data formats, and perform complex transformations.
+The `tf.data` API enables you to build complex input pipelines from simple, reusable pieces. It's very efficient. It enables handling large amounts of data, reading from different data formats, and performing complex transformations.
 
 Load the fashion-mnist dataset into a `tf.data.Dataset` object and do some preprocessing. We normalize the image pixel values from the [0, 255] range to the [0, 1] range. We are keeping an in-memory cache to improve performance. We also shuffle the training data.
 
