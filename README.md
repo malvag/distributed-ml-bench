@@ -851,7 +851,7 @@ Next, we execute the model training steps in parallel.
 
 
 ```yaml
-- name: distributed-tf-training-steps
+- name: distributed-training-step
   steps:
   - - name: cnn-model
       template: cnn-model
