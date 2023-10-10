@@ -3,7 +3,8 @@
 Recently, I was involved in a classification-based ML project where we developed a distributed scalable ML service. I wanted to build it again on a simple dataset to deepen my understanding.
 
 
-<img width="505" alt="image" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/235cec1e-022d-4afa-8508-98f35b724916">
+![Image](https://cdn.kastatic.org/ka-perseus-images/0db827a36e9287ee9c130cf17610faaed276b931.svg)
+
 
 
 
