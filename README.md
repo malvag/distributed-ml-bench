@@ -811,17 +811,15 @@ spec:
   entrypoint: tfjob-wf          # invoke the tfjob template
   templates:
   - name: tfjob-wf
-    # Instead of just running a container
-    # This template has a sequence of steps
     steps:
-    - - name: data-ingestion-step            # data-ingestion-step is run before the following steps
-        template: data-ingestion
-    - - name: distributed-training-step      # double dash => run after previous step
-        template: distributed-training
+    - - name: data-ingestion-step
+        template: data-ingestion-step
+    - - name: distributed-tf-training-steps
+        template: distributed-tf-training-steps
     - - name: model-selection-step
-        template: model-selection
-    - - name: model-serving-step
-        template: model-serving
+        template: model-selection-step
+    - - name: create-model-serving-service
+        template: create-model-serving-service
 podGC:
   strategy: OnPodSuccess
 volumes:
@@ -853,21 +851,21 @@ Next, we execute the model training steps in parallel.
 
 
 ```yaml
-- name: distributed-training-steps
+- name: distributed-tf-training-steps
   steps:
-  - - name: cnn-training-step
-      template: cnn-training-step
-    - name: cnn-with-batchnorm-training-step
-      template: cnn-with-batchnorm-training-step
-    - name: cnn-with-dropout-training-step
-      template: cnn-with-dropout-training-step
+  - - name: cnn-model
+      template: cnn-model
+    - name: cnn-model-with-dropout
+      template: cnn-model-with-dropout
+    - name: cnn-model-with-batch-norm
+      template: cnn-model-with-batch-norm
 ```
 
 Next, we create a step to run distributed training with the CNN model. To create the TFJob, we include the manifest we created before. We also add the `successCondition` and `failureCondition` to indicate if the job is created. Here we are storing the trained model in a different folder. We create similar steps for the other two models.
 
 
 ```yaml
-- name: cnn-training-step
+- name: cnn-model
   serviceAccountName: training-operator
   resource:
     action: create
@@ -922,7 +920,7 @@ Next, we add the model selection step. It is similar to `model-selection.yaml` w
 The last step of the workflow is the model serving.
 
 ```yaml
-- name: model-serving-step
+- name: create-model-serving-service
   serviceAccountName: training-operator
   successCondition: status.modelStatus.states.transitionStatus = UpToDate
   resource:
