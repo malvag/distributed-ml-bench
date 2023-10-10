@@ -6,8 +6,6 @@ Recently, I was involved in a classification-based ML project where we developed
 ![Image](https://cdn.kastatic.org/ka-perseus-images/0db827a36e9287ee9c130cf17610faaed276b931.svg)
 
 
-
-
 ## Introduction
 
 ### What are distributed systems?
@@ -991,3 +989,5 @@ kubectl create -f workflow.yaml
 [14] [Getting Started with Argo Workflows](https://velocity.tech/blog/getting-started-with-argo-workflows)
 
 [15] [Kubernetes best practices](https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-how-and-why-to-build-small-container-images)
+
+[16] [Everything about Distributed Training and Efficient Finetuning](https://sumanthrh.com/post/distributed-and-efficient-finetuning/)
