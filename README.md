@@ -950,11 +950,17 @@ kubectl create -f workflow.yaml
 
 ## Summary
 
-1. A distributed machine learning system is designed to train machine learning models on large datasets that cannot be processed on a single machine. To train complex models with millions or rather billions of parameters, there is a need to distribute the computation or the training process.
+1. A distributed machine learning system is designed to train machine learning models on large datasets that cannot be processed on a single machine. There is a need to distribute the computation or training process to train complex models with millions or rather billions of parameters.
 2. Kubernetes is a popular choice for building such complex distributed systems. We can build scalable and highly available systems using K8s.
 3. Tensorflow provides a number of strategies for distributed training. We have used `MultiWorkerMirroredStrategy` here.
 4. We have used KServe for building an Inference Service which can be autoscaled based on the traffic.
 5. Argo workflows are helpful in building CICD pipelines on Kubernetes.
+
+## Next Steps
+
+- Monitoring the metrics with Prometheus
+- Exploring async strategies
+- Exploring PyTorch FSDP
 
 ## References
 
