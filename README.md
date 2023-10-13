@@ -958,9 +958,9 @@ kubectl create -f workflow.yaml
 
 ## Next Steps
 
-- Monitoring the metrics with Prometheus
-- Exploring async strategies
-- Exploring PyTorch FSDP
+- Monitoring the metrics with Prometheus and Grafana
+- Exploring async strategies (Parameter Server)
+- Exploring PyTorch FSDP and DDP
 
 ## References
 
