@@ -967,7 +967,7 @@ spec:
 kubectl create -f message-dumper.yaml
 ```
 
-Next, we include the logger which points to the message dumper url in the predictor. See inference-service.yaml.
+Next, we include the logger which points to the message dumper url in the InferenceService predictor.
 
 ```yaml
 logger:
