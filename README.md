@@ -958,6 +958,7 @@ kubectl create -f workflow.yaml
 
 ## Next Steps
 
+- Create a Inference Logger
 - Monitoring the metrics with Prometheus and Grafana
 - Exploring async strategies (Parameter Server)
 - Exploring PyTorch FSDP and DDP
