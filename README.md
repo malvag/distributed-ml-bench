@@ -99,7 +99,6 @@ kubens kubeflow
 Now, we install the dependencies for the Kubeflow training operator. This training operator provides Kubernetes custom resources that make running distributed or non-distributed TensorFlow jobs easy on Kubernetes.
 
 ```bash
-# https://github.com/kubeflow/training-operator#stable-release
 kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.5.0"
 ```
 

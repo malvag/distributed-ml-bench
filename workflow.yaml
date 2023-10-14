@@ -109,7 +109,7 @@ spec:
                     - name: tensorflow
                       image: kubeflow/multi-worker-strategy:v0.1
                       imagePullPolicy: IfNotPresent
-                      command: ["python", "/multi-worker-distributed-training.py", "--saved_model_dir", "/trained_model/saved_model_versions/2/", "--checkpoint_dir", "/trained_model/checkpoint", "--model_type", "dropout"]
+                      command: ["python", "/multi-worker-distributed-training.py", "--saved_model_dir", "/trained_model/saved_model_versions/2/", "--checkpoint_dir", "/trained_model/checkpoint", "--model_type", "cnn_batchnorm"]
                       volumeMounts:
                         - mountPath: /trained_model
                           name: training
@@ -146,7 +146,7 @@ spec:
                     - name: tensorflow
                       image: kubeflow/multi-worker-strategy:v0.1
                       imagePullPolicy: IfNotPresent
-                      command: ["python", "/multi-worker-distributed-training.py", "--saved_model_dir", "/trained_model/saved_model_versions/3/", "--checkpoint_dir", "/trained_model/checkpoint", "--model_type", "dropout"]
+                      command: ["python", "/multi-worker-distributed-training.py", "--saved_model_dir", "/trained_model/saved_model_versions/3/", "--checkpoint_dir", "/trained_model/checkpoint", "--model_type", "cnn_dropout"]
                       volumeMounts:
                         - mountPath: /trained_model
                           name: training
@@ -178,7 +178,7 @@ spec:
         apiVersion: serving.kserve.io/v1beta1
         kind: InferenceService
         metadata:
-          name: flower-sample
+          name: tf-mnist
           annotations:
             autoscaling.knative.dev/target: "1"
         spec:
