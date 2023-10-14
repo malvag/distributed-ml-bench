@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: message-dumper
+  name: logger
 spec:
   template:
     spec:
