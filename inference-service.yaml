@@ -6,6 +6,9 @@ metadata:
     autoscaling.knative.dev/target: "1"
 spec:
   predictor:
+    logger:
+      mode: all
+      url: http://message-dumper.default/
     model:
       modelFormat:
         name: tensorflow
