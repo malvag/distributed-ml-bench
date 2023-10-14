@@ -949,7 +949,7 @@ kubectl create -f workflow.yaml
 
 ## Logger
 
-Now, we're serving the model on the KServe
+Now, we're serving the model and we need to log the request and the response.
 
 ## Summary
 
