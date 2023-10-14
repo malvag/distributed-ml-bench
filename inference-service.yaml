@@ -8,7 +8,7 @@ spec:
   predictor:
     logger:
       mode: all
-      url: http://message-dumper.default/
+      url: http://logger.default/
     model:
       modelFormat:
         name: tensorflow
