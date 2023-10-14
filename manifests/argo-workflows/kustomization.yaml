@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: kubeflow
 
 resources:
-- https://github.com/argoproj/argo-workflows/releases/download/v3.5.0/install.yaml
+- https://github.com/argoproj/argo-workflows/releases/download/v3.4.0/install.yaml
 
 patchesStrategicMerge:
 - rbac-patch.yaml

@@ -4,3 +4,4 @@ namespace: kubeflow
 
 resources:
 - argo-workflows/
+- kubeflow-training/
