@@ -947,6 +947,9 @@ kubectl create -f workflow.yaml
 
 <img width="1440" alt="Screenshot 2023-10-08 at 9 25 11 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/40b64461-d3ae-48c0-be1f-7ccc7596905c">
 
+## Logger
+
+Now, we're serving the model on the KServe
 
 ## Summary
 
@@ -958,7 +961,7 @@ kubectl create -f workflow.yaml
 
 ## Next Steps
 
-- Create a Inference Logger
+- Create an Inference Logger
 - Monitoring the metrics with Prometheus and Grafana
 - Exploring async strategies (Parameter Server)
 - Exploring PyTorch FSDP and DDP
