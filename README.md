@@ -944,8 +944,6 @@ Next, run the workflow.
 kubectl create -f workflow.yaml
 ```
 
-<img width="1440" alt="Screenshot 2023-10-08 at 9 25 11 PM" src="https://github.com/aniket-mish/distributed-ml-system/assets/71699313/40b64461-d3ae-48c0-be1f-7ccc7596905c">
-
 ## Logger
 
 Logging is an essential component of the machine learning system. It helps debug issues, analyze performance, troubleshoot errors, gather insights, and implement a feedback loop. Fortunately, KServe makes it easy to create a service called message-dumper. It logs the request and the response. It has a unique identifier for the request and the response.
@@ -975,6 +973,18 @@ logger:
 ```
 
 You can read about the inference logger [here](https://kserve.github.io/website/0.8/modelserving/logger/logger/#create-an-inferenceservice-with-logger).
+
+## Monitoring
+
+I am setting up Prometheus and Grafana to monitor the Kubernetes cluster's resources. 
+
+Prometheus stores data in a time series fashion and Grafana provides dashboards for the visualization.
+
+I am using helm charts here.
+
+```bash
+brew install helm
+```
 
 ## Summary
 
