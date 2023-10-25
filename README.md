@@ -201,6 +201,12 @@ BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
 
 The `num_replicas_in_sync` equals the number of devices that are used in the [all-reduce]() operation. We have used the `tf.distribute.MultiWorkerMirroredStrategy` API and with the help of this strategy, a Keras model that was designed to run on a single worker can seamlessly work on multiple workers with minimal code changes.
 
+What actually happens behind the scenes?
+1. Each GPU performs the forward pass on a different slice of the input data to compute the loss.
+2. Each GPU computes the gradients based on the loss function.
+3. These gradients are aggregated across all of the devices, via an All-reduce algorithm.
+4. The optimizer updates the weights using the reduced gradients thereby keeping the devices in sync.
+
 We have also enabled automatic data sharding across workers by setting `tf.data.experimental.AutoShardPolicy` to `AutoShardPolicy.DATA`. This setting is needed to ensure convergence and performance. Sharding means handing each worker a subset of the entire dataset. You can read more about it [here](https://www.tensorflow.org/api_docs/python/tf/data/experimental/DistributeOptions).
 
 ```python
