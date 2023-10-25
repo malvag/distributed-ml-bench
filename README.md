@@ -1005,9 +1005,7 @@ brew install helm
 ## Next Steps
 
 - ~~Create an Inference Logger~~ See [Logger](#Logger)
-- Monitoring the metrics with Prometheus and Grafana
-- Exploring async strategies (Parameter Server)
-- Exploring PyTorch FSDP and DDP
+- Monitoring the metrics with Prometheus and Grafana See [Monitoring](#Monitoring)
 
 ## References
 
