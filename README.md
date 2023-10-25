@@ -193,6 +193,8 @@ We have used the tensorflow_datasets module which contains a collection of datas
 
 We can consume our dataset in a distributed fashion as well and to do that we can use the same function we created before with some tweaks. When training a model with multiple GPUs, you can use the extra computing power effectively by increasing the batch size. In general, use the largest batch size that fits the GPU memory.
 
+There is also a `MirroredStrategy()` which works on a single machine with multiple GPUs but if you want to distribute the training on multiple machines then the `MultiWorkerMirroredStrategy()` is the way to go.
+
 ```python
 strategy = tf.distribute.MultiWorkerMirroredStrategy()
 BATCH_SIZE_PER_REPLICA = 64
