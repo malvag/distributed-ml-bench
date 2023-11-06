@@ -21,8 +21,8 @@ spec:
         template: distributed-tf-training-steps
     - - name: model-selection-step
         template: model-selection-step
-    - - name: create-model-serving-service
-        template: create-model-serving-service
+#    - - name: create-model-serving-service
+#        template: create-model-serving-service
 
   - name: data-ingestion-step
     serviceAccountName: argo
@@ -52,7 +52,7 @@ spec:
     resource:
       action: create
       setOwnerReference: true
-      successCondition: status.replicaStatuses.Worker.succeeded = 2
+      successCondition: status.replicaStatuses.Worker.succeeded = 4 
       failureCondition: status.replicaStatuses.Worker.failed > 0
       manifest: |
         apiVersion: kubeflow.org/v1
@@ -64,7 +64,7 @@ spec:
             cleanPodPolicy: None
           tfReplicaSpecs:
             Worker:
-              replicas: 2
+              replicas: 4
               restartPolicy: Never
               template:
                 spec:
@@ -89,7 +89,7 @@ spec:
     resource:
       action: create
       setOwnerReference: true
-      successCondition: status.replicaStatuses.Worker.succeeded = 2
+      successCondition: status.replicaStatuses.Worker.succeeded = 4
       failureCondition: status.replicaStatuses.Worker.failed > 0
       manifest: |
         apiVersion: kubeflow.org/v1
@@ -101,7 +101,7 @@ spec:
             cleanPodPolicy: None
           tfReplicaSpecs:
             Worker:
-              replicas: 2
+              replicas: 4
               restartPolicy: Never
               template:
                 spec:
@@ -126,7 +126,7 @@ spec:
     resource:
       action: create
       setOwnerReference: true
-      successCondition: status.replicaStatuses.Worker.succeeded = 2
+      successCondition: status.replicaStatuses.Worker.succeeded = 4
       failureCondition: status.replicaStatuses.Worker.failed > 0
       manifest: |
         apiVersion: kubeflow.org/v1
@@ -138,7 +138,7 @@ spec:
             cleanPodPolicy: None
           tfReplicaSpecs:
             Worker:
-              replicas: 2
+              replicas: 4
               restartPolicy: Never
               template:
                 spec:
@@ -167,24 +167,24 @@ spec:
       volumeMounts:
       - name: model
         mountPath: /trained_model
-
-  - name: create-model-serving-service
-    serviceAccountName: training-operator
-    successCondition: status.modelStatus.states.transitionStatus = UpToDate
-    resource:
-      action: create
-      setOwnerReference: true
-      manifest: |
-        apiVersion: serving.kserve.io/v1beta1
-        kind: InferenceService
-        metadata:
-          name: tf-mnist
-          annotations:
-            autoscaling.knative.dev/target: "1"
-        spec:
-          predictor:
-            model:
-              modelFormat:
-                name: tensorflow
-              image: "emacski/tensorflow-serving:2.6.0"
-              storageUri: "pvc://strategy-volume/saved_model_versions"
+#
+#  - name: create-model-serving-service
+#    serviceAccountName: training-operator
+#    successCondition: status.modelStatus.states.transitionStatus = UpToDate
+#    resource:
+#      action: create
+#      setOwnerReference: true
+#      manifest: |
+#        apiVersion: serving.kserve.io/v1beta1
+#        kind: InferenceService
+#        metadata:
+#          name: tf-mnist
+#          annotations:
+#            autoscaling.knative.dev/target: "1"
+#        spec:
+#          predictor:
+#            model:
+#              modelFormat:
+#                name: tensorflow
+#              image: "emacski/tensorflow-serving:2.6.0"
+#              storageUri: "pvc://strategy-volume/saved_model_versions"
