@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: strategy-volume
 spec:
-  accessModes: [ "ReadWriteOnce" ]
+  accessModes: [ "ReadWriteMany" ]
   resources:
     requests:
-      storage: 1Gi
+      storage: 6Gi
