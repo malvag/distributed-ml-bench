@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: kubeflow
   name: strategy-volume
 spec:
   accessModes: [ "ReadWriteMany" ]
